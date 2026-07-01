@@ -22,4 +22,4 @@ vp dev       # start dev server
 vp run deploy
 ```
 
-Production: [preview.ryuko.my.id](https://preview.ryuko.my.id)
+url: [preview.ryuko.my.id](https://preview.ryuko.my.id)
