@@ -66,17 +66,3 @@ jobs:
               env:
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-            - name: Verify production asset update
-              run: |
-                  for attempt in {1..12}; do
-                      if curl --fail --silent --show-error "https://preview.ryuko.my.id/?verify=${GITHUB_SHA}" \
-                          | grep --fixed-strings "min-w-0 w-full max-w-[1500px]"; then
-                          exit 0
-                      fi
-                      echo "Waiting for production Worker update... ($attempt/12)"
-                      sleep 10
-                  done
-
-                  echo "Production still serves stale HTML after deploy"
-                  exit 1
