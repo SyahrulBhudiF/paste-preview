@@ -5,10 +5,18 @@ export const PasteLanguageSchema = Schema.Union([
   Schema.Literal("markdown"),
   Schema.Literal("typescript"),
   Schema.Literal("javascript"),
+  Schema.Literal("jsx"),
+  Schema.Literal("tsx"),
   Schema.Literal("json"),
   Schema.Literal("html"),
+  Schema.Literal("vue"),
+  Schema.Literal("astro"),
+  Schema.Literal("svelte"),
   Schema.Literal("css"),
   Schema.Literal("bash"),
+  Schema.Literal("go"),
+  Schema.Literal("rust"),
+  Schema.Literal("php"),
   Schema.Literal("text"),
 ]);
 

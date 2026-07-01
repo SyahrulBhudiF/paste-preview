@@ -3,16 +3,11 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useMemo, useState } from "react";
 import { createPaste } from "@/apis/paste";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { PastePreview } from "./components/PastePreview";
 import {
   detectPasteLanguage,
+  normalizeLanguage,
   PasteLanguages,
   type PasteLanguage,
 } from "@/features/paste-preview/language";
@@ -32,15 +27,15 @@ const defaultValues: PasteFormValues = {
 export function PastePreviewFeature() {
   const [content, setContent] = useState(defaultValues.content);
   const [language, setLanguage] = useState<PasteLanguage>(defaultValues.language);
-  const [detectedLanguage, setDetectedLanguage] = useState<PasteLanguage>("text");
   const [activePane, setActivePane] = useState<"editor" | "preview">("editor");
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const previewLanguage = useMemo(
-    () => (language === "auto" ? detectedLanguage : language),
-    [language, detectedLanguage],
-  );
+  const selectedLanguage = language || "auto";
+  const detectedLanguage = useMemo(() => detectPasteLanguage(content), [content]);
+  const previewLanguage = selectedLanguage === "auto" ? detectedLanguage : selectedLanguage;
+  const languageLabel =
+    PasteLanguages.find((item) => item.value === previewLanguage)?.label ?? previewLanguage;
   const hasContent = content.trim().length > 0;
 
   const createPasteMutation = useMutation({
@@ -49,7 +44,8 @@ export function PastePreviewFeature() {
         data: {
           content: value.content,
           language: value.language,
-          detectedLanguage: value.language === "auto" ? detectedLanguage : value.language,
+          detectedLanguage:
+            value.language === "auto" ? detectPasteLanguage(value.content) : value.language,
         },
       }),
     onSuccess: (result) => {
@@ -81,11 +77,14 @@ export function PastePreviewFeature() {
     if (!raw) return;
 
     try {
-      const draft = JSON.parse(raw) as PasteFormValues;
-      setContent(draft.content);
-      setLanguage(draft.language);
-      form.setFieldValue("content", draft.content);
-      form.setFieldValue("language", draft.language);
+      const draft = JSON.parse(raw) as Partial<PasteFormValues>;
+      const draftContent = draft.content ?? "";
+      const draftLanguage = draft.language ? normalizeLanguage(draft.language) : "auto";
+
+      setContent(draftContent);
+      setLanguage(draftLanguage);
+      form.setFieldValue("content", draftContent);
+      form.setFieldValue("language", draftLanguage);
     } catch {
       localStorage.removeItem(DraftStorageKey);
     }
@@ -93,17 +92,13 @@ export function PastePreviewFeature() {
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
-      localStorage.setItem(DraftStorageKey, JSON.stringify({ content, language }));
+      localStorage.setItem(
+        DraftStorageKey,
+        JSON.stringify({ content, language: selectedLanguage }),
+      );
     }, 500);
     return () => window.clearTimeout(handle);
-  }, [content, language]);
-
-  useEffect(() => {
-    const handle = window.setTimeout(() => {
-      setDetectedLanguage(detectPasteLanguage(content));
-    }, 600);
-    return () => window.clearTimeout(handle);
-  }, [content]);
+  }, [content, selectedLanguage]);
 
   const copyShareUrl = async () => {
     if (!shareUrl) return;
@@ -120,51 +115,24 @@ export function PastePreviewFeature() {
           void form.handleSubmit();
         }}
       >
-        <header className="rounded-3xl border border-border/70 bg-card/75 p-4 shadow-sm backdrop-blur md:p-5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
-                public preview · expires in 7 days
-              </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Paste preview
-              </h1>
-            </div>
-
+        {shareUrl ? (
+          <div className="rounded-2xl border border-primary/25 bg-primary/10 p-3 text-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="rounded-2xl border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-                Language: <span className="font-medium text-foreground">{previewLanguage}</span>
-              </div>
-              <Button
-                type="submit"
-                disabled={createPasteMutation.isPending || !hasContent}
-                className="h-11 rounded-2xl px-5 shadow-sm transition-transform active:scale-[0.98]"
-              >
-                {createPasteMutation.isPending ? "Saving..." : "Save & share"}
+              <a className="break-all text-primary underline underline-offset-4" href={shareUrl}>
+                {shareUrl}
+              </a>
+              <Button type="button" size="sm" variant="secondary" onClick={copyShareUrl}>
+                Copy
               </Button>
             </div>
           </div>
+        ) : null}
 
-          {shareUrl ? (
-            <div className="mt-4 rounded-2xl border border-primary/25 bg-primary/10 p-3 text-sm">
-              <p className="mb-2 font-medium">Share link ready</p>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <a className="break-all text-primary underline underline-offset-4" href={shareUrl}>
-                  {shareUrl}
-                </a>
-                <Button type="button" size="sm" variant="secondary" onClick={copyShareUrl}>
-                  Copy
-                </Button>
-              </div>
-            </div>
-          ) : null}
-
-          {error ? (
-            <p className="mt-4 rounded-2xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
-            </p>
-          ) : null}
-        </header>
+        {error ? (
+          <p className="rounded-2xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
 
         <div className="grid grid-cols-2 gap-2 rounded-2xl border bg-card/70 p-1 md:hidden">
           <Button
@@ -196,14 +164,14 @@ export function PastePreviewFeature() {
             <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <label className="text-sm font-semibold" htmlFor="paste-content">
-                  Source
+                  Paste Preview
                 </label>
-                <p className="text-xs text-muted-foreground">Auto-detect updates after typing.</p>
+                <p className="text-xs text-muted-foreground">Source · expires in 7 days</p>
               </div>
               <form.Field name="language">
                 {(field) => (
                   <Select
-                    value={field.state.value}
+                    value={selectedLanguage}
                     onValueChange={(value) => {
                       const next = value as PasteLanguage;
                       field.handleChange(next);
@@ -211,7 +179,7 @@ export function PastePreviewFeature() {
                     }}
                   >
                     <SelectTrigger className="h-11 w-full rounded-2xl bg-card/80 sm:w-52">
-                      <SelectValue placeholder="Language" />
+                      <span className="truncate">{languageLabel}</span>
                     </SelectTrigger>
                     <SelectContent>
                       {PasteLanguages.map((item) => (
@@ -249,18 +217,22 @@ export function PastePreviewFeature() {
                 : "flex min-h-0 flex-col"
             }
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-sm font-semibold">Preview</h2>
                 <p className="text-xs text-muted-foreground">
-                  Rendering as <span className="text-foreground">{previewLanguage}</span>
+                  {content.length.toLocaleString()} chars
                 </p>
               </div>
-              <span className="rounded-xl border bg-card/80 px-3 py-1.5 text-xs text-muted-foreground">
-                {content.length.toLocaleString()} chars
-              </span>
+              <Button
+                type="submit"
+                disabled={createPasteMutation.isPending || !hasContent}
+                className="h-11 rounded-2xl px-5 shadow-sm transition-transform active:scale-[0.98]"
+              >
+                {createPasteMutation.isPending ? "Saving..." : "Save & share"}
+              </Button>
             </div>
-            <div className="min-h-[62dvh] flex-1 overflow-auto rounded-3xl border border-border/80 bg-card/85 p-4 shadow-sm backdrop-blur">
+            <div className="min-h-[62dvh] flex-1 overflow-auto rounded-3xl border border-border/80 bg-card/85 shadow-sm backdrop-blur">
               <PastePreview content={content} language={previewLanguage} />
             </div>
           </section>
