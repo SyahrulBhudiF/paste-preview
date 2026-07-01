@@ -69,5 +69,14 @@ jobs:
 
             - name: Verify production asset update
               run: |
-                  curl --fail --silent --show-error https://preview.ryuko.my.id \
-                      | grep --fixed-strings "min-w-0 w-full max-w-[1500px]"
+                  for attempt in {1..12}; do
+                      if curl --fail --silent --show-error "https://preview.ryuko.my.id/?verify=${GITHUB_SHA}" \
+                          | grep --fixed-strings "min-w-0 w-full max-w-[1500px]"; then
+                          exit 0
+                      fi
+                      echo "Waiting for production Worker update... ($attempt/12)"
+                      sleep 10
+                  done
+
+                  echo "Production still serves stale HTML after deploy"
+                  exit 1
