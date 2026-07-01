@@ -62,7 +62,12 @@ jobs:
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
             - name: Deploy
-              run: pnpm run deploy:adopt
+              run: pnpm run deploy:ci
               env:
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+            - name: Verify production asset update
+              run: |
+                  curl --fail --silent --show-error https://preview.ryuko.my.id \
+                      | grep --fixed-strings "min-w-0 w-full max-w-[1500px]"
