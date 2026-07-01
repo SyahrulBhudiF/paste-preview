@@ -1,0 +1,22 @@
+/node_modules
+
+# build
+/dist
+
+# cloudflare
+.wrangler
+.dev.vars
+
+# tanstack
+.tanstack
+
+# alchemy state
+.alchemy
+
+# env
+.env
+.env.*
+
+# misc
+*.log
+.DS_Store
