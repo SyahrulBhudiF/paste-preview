@@ -6,6 +6,7 @@
 		"start": "vp dev --host 0.0.0.0",
 		"alchemy:login": "vp exec alchemy login alchemy/alchemy.run.ts --configure",
 		"deploy": "vp exec alchemy deploy alchemy/alchemy.run.ts",
+		"deploy:adopt": "vp exec alchemy deploy --adopt alchemy/alchemy.run.ts",
 		"destroy": "vp exec alchemy destroy alchemy/alchemy.run.ts",
 		"infra:dev": "vp exec alchemy dev alchemy/alchemy.run.ts",
 		"cf-typegen": "vp exec wrangler types",
