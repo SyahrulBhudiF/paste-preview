@@ -1,6 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import "github-markdown-css/github-markdown-light.css";
 import "@/styles/app.css";
 
 interface RouterContext {

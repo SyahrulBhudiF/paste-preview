@@ -187,3 +187,27 @@
 		letter-spacing: var(--tracking-normal);
 	}
 }
+
+@layer components {
+	.markdown-body {
+		--color-canvas-default: transparent;
+		--color-fg-default: var(--foreground);
+		--color-fg-muted: var(--muted-foreground);
+		--color-border-default: var(--border);
+		--color-border-muted: var(--border);
+		--color-canvas-subtle: var(--muted);
+		--color-accent-fg: var(--primary);
+		background: transparent;
+		color: var(--foreground);
+		font-family: var(--font-sans);
+	}
+
+	.markdown-body pre,
+	.markdown-body code {
+		font-family: var(--font-mono);
+	}
+
+	.markdown-body pre {
+		border: 1px solid var(--border);
+	}
+}

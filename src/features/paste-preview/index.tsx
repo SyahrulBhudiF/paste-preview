@@ -36,8 +36,13 @@ export function PastePreviewFeature() {
 	const selectedLanguage = language || "auto";
 	const detectedLanguage = useMemo(() => detectPasteLanguage(content), [content]);
 	const previewLanguage = selectedLanguage === "auto" ? detectedLanguage : selectedLanguage;
+	const detectedLanguageLabel =
+		PasteLanguages.find((item) => item.value === detectedLanguage)?.label ?? detectedLanguage;
 	const languageLabel =
-		PasteLanguages.find((item) => item.value === previewLanguage)?.label ?? previewLanguage;
+		selectedLanguage === "auto"
+			? `Auto: ${detectedLanguageLabel}`
+			: (PasteLanguages.find((item) => item.value === previewLanguage)?.label ??
+				previewLanguage);
 	const hasContent = content.trim().length > 0;
 
 	const createPasteMutation = useMutation({
@@ -117,9 +122,9 @@ export function PastePreviewFeature() {
 	};
 
 	return (
-		<main className="min-h-dvh overflow-hidden bg-[radial-gradient(circle_at_top_left,color-mix(in_oklch,var(--primary)_18%,transparent),transparent_34rem),linear-gradient(135deg,var(--background),color-mix(in_oklch,var(--secondary)_38%,var(--background)))] text-foreground">
+		<main className="h-dvh overflow-hidden bg-[radial-gradient(circle_at_top_left,color-mix(in_oklch,var(--primary)_18%,transparent),transparent_34rem),linear-gradient(135deg,var(--background),color-mix(in_oklch,var(--secondary)_38%,var(--background)))] text-foreground">
 			<form
-				className="mx-auto flex min-h-dvh w-full max-w-[1500px] flex-col gap-5 px-4 py-5 md:px-6 lg:px-8"
+				className="mx-auto flex h-dvh min-h-0 w-full max-w-[1500px] flex-col gap-5 overflow-hidden px-4 py-5 md:px-6 lg:px-8"
 				onSubmit={(event) => {
 					event.preventDefault();
 					event.stopPropagation();
@@ -178,7 +183,7 @@ export function PastePreviewFeature() {
 					</Button>
 				</div>
 
-				<div className="grid flex-1 gap-5 md:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
+				<div className="grid min-h-0 flex-1 gap-5 md:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
 					<section
 						className={
 							activePane === "preview"
@@ -229,7 +234,7 @@ export function PastePreviewFeature() {
 										field.handleChange(event.target.value);
 										setContent(event.target.value);
 									}}
-									className="min-h-[62dvh] flex-1 resize-none rounded-3xl border border-border/80 bg-card/90 p-5 font-mono text-sm leading-7 shadow-sm outline-none ring-offset-background transition focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
+									className="min-h-0 flex-1 resize-none overflow-auto rounded-3xl border border-border/80 bg-card/90 p-5 font-mono text-sm leading-7 shadow-sm outline-none ring-offset-background transition focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
 									placeholder="Paste code, Markdown, JSON, shell commands, or notes..."
 									spellCheck={false}
 								/>
@@ -259,7 +264,7 @@ export function PastePreviewFeature() {
 								{createPasteMutation.isPending ? "Saving..." : "Save & share"}
 							</Button>
 						</div>
-						<div className="min-h-[62dvh] flex-1 overflow-auto rounded-3xl border border-border/80 bg-card/85 shadow-sm backdrop-blur">
+						<div className="min-h-0 flex-1 overflow-auto rounded-3xl border border-border/80 bg-card/85 shadow-sm backdrop-blur">
 							<PastePreview content={content} language={previewLanguage} />
 						</div>
 					</section>

@@ -11,6 +11,7 @@ export const SelectTrigger = ({
 	...props
 }: SelectPrimitive.SelectTriggerProps) => (
 	<SelectPrimitive.Trigger
+		type="button"
 		className={cn(
 			"flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
 			className,
@@ -31,8 +32,10 @@ export const SelectContent = ({
 }: SelectPrimitive.SelectContentProps) => (
 	<SelectPrimitive.Portal>
 		<SelectPrimitive.Content
+			position="popper"
+			sideOffset={6}
 			className={cn(
-				"z-50 min-w-32 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md",
+				"z-[100] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md",
 				className,
 			)}
 			{...props}
