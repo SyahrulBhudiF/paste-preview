@@ -1,29 +1,39 @@
-import alchemy from "alchemy";
-import { KVNamespace, RateLimit, TanStackStart } from "alchemy/cloudflare";
+import * as Alchemy from "alchemy";
+import * as Cloudflare from "alchemy/Cloudflare";
+import * as Effect from "effect/Effect";
 
-const app = await alchemy("paste-preview");
-
-const PASTES = await KVNamespace("PASTES", {
-	title: "paste-preview-pastes",
-	adopt: true,
-});
-
-const RATE_LIMIT = RateLimit({
-	namespace_id: 1001,
-	simple: { limit: 10, period: 60 },
-});
-
-export const worker = await TanStackStart("paste-preview", {
-	name: "paste-preview",
-	bindings: {
-		PASTES,
-		RATE_LIMIT,
+export default Alchemy.Stack(
+	"paste-preview",
+	{
+		providers: Cloudflare.providers(),
+		state: Cloudflare.state(),
 	},
-	domains: ["preview.ryuko.my.id"],
-	compatibilityFlags: ["nodejs_compat"],
-	observability: { enabled: true },
-	build: "vp build",
-	dev: "vp dev",
-});
+	Effect.gen(function* () {
+		const PASTES = yield* Cloudflare.KV.Namespace("PASTES", {
+			title: "paste-preview-pastes",
+		});
 
-await app.finalize();
+		const RATE_LIMIT = Cloudflare.RateLimit("RATE_LIMIT", {
+			namespaceId: 1001,
+			simple: { limit: 10, period: 60 },
+		});
+
+		const worker = yield* Cloudflare.Website.Vite("paste-preview", {
+			name: "paste-preview",
+			env: {
+				PASTES,
+				RATE_LIMIT,
+			},
+			domain: ["preview.ryuko.my.id"],
+			compatibility: {
+				flags: ["nodejs_compat"],
+			},
+			observability: { enabled: true },
+		});
+
+		return {
+			pastesNamespaceId: PASTES.namespaceId,
+			workerId: worker.workerId,
+		};
+	}),
+);
