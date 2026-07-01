@@ -62,9 +62,11 @@ export function CodePreview({ content, language }: { content: string; language: 
 	}, [content, fallbackHtml, shikiLanguage]);
 
 	return (
-		<div
-			className="w-full max-w-full overflow-x-auto p-5 font-mono text-sm leading-7 [&_.shiki]:bg-transparent! [&_.shiki]:outline-none [&_code]:font-mono [&_pre]:m-0 [&_pre]:w-max [&_pre]:min-w-full"
-			dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-		/>
+		<div className="w-full max-w-full overflow-x-auto overflow-y-auto p-5 font-mono text-sm leading-7">
+			<div
+				className="min-w-max [&_.shiki]:bg-transparent! [&_.shiki]:outline-none [&_code]:font-mono [&_pre]:m-0"
+				dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+			/>
+		</div>
 	);
 }
