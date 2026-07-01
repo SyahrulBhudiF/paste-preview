@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 import "@/styles/app.css";
 
 interface RouterContext {
@@ -25,6 +26,7 @@ function RootDocument() {
 			</head>
 			<body>
 				<Outlet />
+				<Toaster position="bottom-right" richColors />
 				<Scripts />
 			</body>
 		</html>

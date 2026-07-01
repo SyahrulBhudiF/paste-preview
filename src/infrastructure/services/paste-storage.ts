@@ -12,6 +12,7 @@ export interface PasteStorageServiceShape {
 }
 
 const pasteKey = (id: string) => `paste:${id}`;
+const DevPasteStore = new Map<string, string>();
 
 const getOrigin = () => {
 	if (typeof location !== "undefined") return location.origin;
@@ -34,9 +35,13 @@ const create: PasteStorageServiceShape["create"] = (input) =>
 				expiresAt: expiresAt.toISOString(),
 			};
 
-			await env.PASTES.put(pasteKey(id), JSON.stringify(paste), {
-				expirationTtl: PasteTtlSeconds,
-			});
+			if (env.PASTES) {
+				await env.PASTES.put(pasteKey(id), JSON.stringify(paste), {
+					expirationTtl: PasteTtlSeconds,
+				});
+			} else {
+				DevPasteStore.set(pasteKey(id), JSON.stringify(paste));
+			}
 
 			return {
 				id,
@@ -54,7 +59,9 @@ const create: PasteStorageServiceShape["create"] = (input) =>
 const getById: PasteStorageServiceShape["getById"] = (id) =>
 	Effect.tryPromise({
 		try: async () => {
-			const value = await env.PASTES.get(pasteKey(id));
+			const value = env.PASTES
+				? await env.PASTES.get(pasteKey(id))
+				: DevPasteStore.get(pasteKey(id));
 			if (!value) {
 				throw new PasteNotFoundError({
 					message: "Paste not found or expired.",

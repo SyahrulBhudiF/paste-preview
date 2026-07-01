@@ -42,6 +42,7 @@
 		"rehype-sanitize": "latest",
 		"remark-gfm": "latest",
 		"shiki": "^4.3.0",
+		"sonner": "^2.0.7",
 		"tailwind-merge": "latest",
 		"tailwindcss": "latest",
 		"tw-animate-css": "latest",

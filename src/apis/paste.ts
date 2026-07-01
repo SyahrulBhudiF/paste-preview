@@ -12,6 +12,8 @@ const rateLimitMiddleware = createMiddleware({ type: "request" }).server(
 			request.headers.get("CF-Connecting-IP") ??
 			request.headers.get("x-forwarded-for") ??
 			"unknown";
+		if (!env.RATE_LIMIT) return next();
+
 		const { success } = await env.RATE_LIMIT.limit({ key: ip });
 
 		if (!success) {

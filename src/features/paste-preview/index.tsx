@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { createPaste } from "@/apis/paste";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
@@ -56,6 +58,7 @@ export function PastePreviewFeature() {
 		},
 		onError: () => {
 			setError("Could not save paste. Your editor content is still here.");
+			toast.error("Could not save paste");
 		},
 	});
 
@@ -104,7 +107,13 @@ export function PastePreviewFeature() {
 
 	const copyShareUrl = async () => {
 		if (!shareUrl) return;
-		await navigator.clipboard.writeText(shareUrl);
+
+		try {
+			await navigator.clipboard.writeText(shareUrl);
+			toast.success("Link copied");
+		} catch {
+			toast.error("Could not copy link");
+		}
 	};
 
 	return (
@@ -118,21 +127,27 @@ export function PastePreviewFeature() {
 				}}
 			>
 				{shareUrl ? (
-					<div className="rounded-2xl border border-primary/25 bg-primary/10 p-3 text-sm">
-						<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-							<a
-								className="break-all text-primary underline underline-offset-4"
-								href={shareUrl}
-							>
-								{shareUrl}
-							</a>
+					<div className="rounded-3xl border border-border/80 bg-card/90 p-3 shadow-sm">
+						<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+							<div className="min-w-0 flex-1">
+								<p className="text-xs font-medium text-muted-foreground">
+									Public preview link
+								</p>
+								<Link
+									className="block truncate text-sm text-primary underline-offset-4 hover:underline"
+									to={shareUrl}
+								>
+									{shareUrl}
+								</Link>
+							</div>
 							<Button
 								type="button"
 								size="sm"
 								variant="secondary"
+								className="h-9 rounded-2xl px-4"
 								onClick={copyShareUrl}
 							>
-								Copy
+								Copy link
 							</Button>
 						</div>
 					</div>
