@@ -1,19 +1,19 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "react", "jsx-a11y", "vitest"],
-  "env": {
-    "browser": true,
-    "es2022": true,
-    "node": true
-  },
-  "ignorePatterns": [
-    "node_modules/**",
-    "dist/**",
-    ".alchemy/**",
-    ".wrangler/**",
-    "src/routeTree.gen.ts"
-  ],
-  "rules": {
-    "no-console": "warn"
-  }
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "react", "jsx-a11y", "vitest"],
+	"env": {
+		"browser": true,
+		"es2022": true,
+		"node": true
+	},
+	"ignorePatterns": [
+		"node_modules/**",
+		"dist/**",
+		".alchemy/**",
+		".wrangler/**",
+		"src/routeTree.gen.ts"
+	],
+	"rules": {
+		"no-console": "warn"
+	}
 }

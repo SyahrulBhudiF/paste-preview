@@ -57,12 +57,12 @@ src/styles/app.css        Tailwind theme tokens
 import { Context, Effect, Layer } from "effect";
 
 export class MyService extends Context.Service<MyService>()("MyService", {
-  make: Effect.gen(function* () {
-    // inject dependencies via yield*
-    return { methodA, methodB };
-  }),
+	make: Effect.gen(function* () {
+		// inject dependencies via yield*
+		return { methodA, methodB };
+	}),
 }) {
-  static readonly layer = Layer.effect(this, this.make);
+	static readonly layer = Layer.effect(this, this.make);
 }
 ```
 
@@ -78,7 +78,7 @@ export class MyService extends Context.Service<MyService>()("MyService", {
 
 ```ts
 export class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
-  message: Schema.String,
+	message: Schema.String,
 }) {}
 ```
 

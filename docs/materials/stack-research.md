@@ -23,7 +23,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [cloudflare({ viteEnvironment: { name: "ssr" } }), tanstackStart(), react()],
+	plugins: [cloudflare({ viteEnvironment: { name: "ssr" } }), tanstackStart(), react()],
 });
 ```
 
@@ -31,12 +31,12 @@ Wrangler shape:
 
 ```jsonc
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "paste-preview",
-  "compatibility_date": "2026-07-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
-  "observability": { "enabled": true },
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "paste-preview",
+	"compatibility_date": "2026-07-01",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "@tanstack/react-start/server-entry",
+	"observability": { "enabled": true },
 }
 ```
 
@@ -159,9 +159,9 @@ Schemas:
 
 ```ts
 const CreatePasteInputSchema = z.object({
-  content: z.string().min(1).max(200_000),
-  language: z.string().min(1),
-  detectedLanguage: z.string().optional(),
+	content: z.string().min(1).max(200_000),
+	language: z.string().min(1),
+	detectedLanguage: z.string().optional(),
 });
 ```
 
@@ -257,24 +257,24 @@ import { Effect } from "effect";
 import { Worker, KV, RateLimit } from "alchemy/cloudflare";
 
 export default Alchemy.Stack(
-  "paste-preview",
-  { providers: Cloudflare.providers() },
-  Effect.gen(function* () {
-    const PASTES = yield* KV.Namespace("PASTES");
+	"paste-preview",
+	{ providers: Cloudflare.providers() },
+	Effect.gen(function* () {
+		const PASTES = yield* KV.Namespace("PASTES");
 
-    const rateLimit = RateLimit({
-      namespace_id: 1001,
-      simple: { limit: 10, period: 60 },
-    });
+		const rateLimit = RateLimit({
+			namespace_id: 1001,
+			simple: { limit: 10, period: 60 },
+		});
 
-    const worker = yield* Worker("paste-preview", {
-      entrypoint: "./src/worker.ts",
-      domains: ["preview.ryuko.my.id"],
-      env: { PASTES, RATE_LIMIT: rateLimit },
-    });
+		const worker = yield* Worker("paste-preview", {
+			entrypoint: "./src/worker.ts",
+			domains: ["preview.ryuko.my.id"],
+			env: { PASTES, RATE_LIMIT: rateLimit },
+		});
 
-    return { url: worker.url };
-  }),
+		return { url: worker.url };
+	}),
 );
 ```
 

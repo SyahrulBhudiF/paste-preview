@@ -5,15 +5,15 @@ import { PublicPastePreview } from "@/features/paste-preview/components/PublicPa
 import { pasteQueryOptions } from "@/features/paste-preview/queries";
 
 export const Route = createFileRoute("/p/$pasteId")({
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(pasteQueryOptions(params.pasteId)),
-  component: PasteRoute,
+	loader: ({ context, params }) =>
+		context.queryClient.ensureQueryData(pasteQueryOptions(params.pasteId)),
+	component: PasteRoute,
 });
 
 function PasteRoute() {
-  const { pasteId } = Route.useParams();
-  const { data: paste } = useSuspenseQuery(pasteQueryOptions(pasteId));
+	const { pasteId } = Route.useParams();
+	const { data: paste } = useSuspenseQuery(pasteQueryOptions(pasteId));
 
-  if (!paste) return <NotFoundPaste />;
-  return <PublicPastePreview paste={paste} />;
+	if (!paste) return <NotFoundPaste />;
+	return <PublicPastePreview paste={paste} />;
 }

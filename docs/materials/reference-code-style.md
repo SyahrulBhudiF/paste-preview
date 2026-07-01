@@ -30,23 +30,23 @@ Reference scripts for this project:
 
 ```json
 {
-  "scripts": {
-    "dev": "vp dev",
-    "build": "vp build",
-    "start": "vp dev --host 0.0.0.0",
-    "deploy": "alchemy deploy alchemy/alchemy.run.ts",
-    "destroy": "alchemy destroy alchemy/alchemy.run.ts",
-    "infra:dev": "alchemy dev alchemy/alchemy.run.ts",
-    "cf-typegen": "wrangler types",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "check": "vp check",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "prepare": "husky"
-  }
+	"scripts": {
+		"dev": "vp dev",
+		"build": "vp build",
+		"start": "vp dev --host 0.0.0.0",
+		"deploy": "alchemy deploy alchemy/alchemy.run.ts",
+		"destroy": "alchemy destroy alchemy/alchemy.run.ts",
+		"infra:dev": "alchemy dev alchemy/alchemy.run.ts",
+		"cf-typegen": "wrangler types",
+		"lint": "oxlint",
+		"lint:fix": "oxlint --fix",
+		"format": "oxfmt",
+		"format:check": "oxfmt --check",
+		"check": "vp check",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"prepare": "husky"
+	}
 }
 ```
 
@@ -91,15 +91,15 @@ Reason: npm `effect@4.0.0-beta.92` does not export `ServiceMap`; current v4 beta
 import { Context, Effect, Layer } from "effect";
 
 export class PasteService extends Context.Service<PasteService>()("PasteService", {
-  make: Effect.gen(function* () {
-    const create = Effect.fn("PasteService.create")(function* (input) {
-      // service work
-    });
+	make: Effect.gen(function* () {
+		const create = Effect.fn("PasteService.create")(function* (input) {
+			// service work
+		});
 
-    return { create };
-  }),
+		return { create };
+	}),
 }) {
-  static readonly layer = Layer.effect(this, this.make);
+	static readonly layer = Layer.effect(this, this.make);
 }
 ```
 
@@ -119,10 +119,10 @@ Pattern:
 import { Schema } from "effect";
 
 export class PasteNotFoundError extends Schema.TaggedErrorClass<PasteNotFoundError>(
-  "PasteNotFoundError",
+	"PasteNotFoundError",
 )({
-  message: Schema.String,
-  pasteId: Schema.String,
+	message: Schema.String,
+	pasteId: Schema.String,
 }) {}
 ```
 

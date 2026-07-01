@@ -38,12 +38,12 @@ Value JSON:
 
 ```json
 {
-  "id": "abc123",
-  "content": "# Hello",
-  "language": "markdown",
-  "detectedLanguage": "markdown",
-  "createdAt": "2026-07-02T00:00:00.000Z",
-  "expiresAt": "2026-07-09T00:00:00.000Z"
+	"id": "abc123",
+	"content": "# Hello",
+	"language": "markdown",
+	"detectedLanguage": "markdown",
+	"createdAt": "2026-07-02T00:00:00.000Z",
+	"expiresAt": "2026-07-09T00:00:00.000Z"
 }
 ```
 

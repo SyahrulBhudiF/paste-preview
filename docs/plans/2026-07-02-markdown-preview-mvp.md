@@ -39,15 +39,15 @@ Effect style follows QUIS:
 
 ```ts
 export class PasteService extends Context.Service<PasteService>()("PasteService", {
-  make: Effect.gen(function* () {
-    const create = Effect.fn("PasteService.create")(function* (input) {
-      // work
-    });
+	make: Effect.gen(function* () {
+		const create = Effect.fn("PasteService.create")(function* (input) {
+			// work
+		});
 
-    return { create };
-  }),
+		return { create };
+	}),
 }) {
-  static readonly layer = Layer.effect(this, this.make);
+	static readonly layer = Layer.effect(this, this.make);
 }
 ```
 
@@ -94,24 +94,24 @@ Create `package.json` with Vite+ `vp`, Oxlint, Oxfmt, Vitest, and Husky scripts:
 
 ```json
 {
-  "type": "module",
-  "scripts": {
-    "dev": "vp dev",
-    "build": "vp build",
-    "start": "vp dev --host 0.0.0.0",
-    "deploy": "alchemy deploy alchemy/alchemy.run.ts",
-    "destroy": "alchemy destroy alchemy/alchemy.run.ts",
-    "infra:dev": "alchemy dev alchemy/alchemy.run.ts",
-    "cf-typegen": "wrangler types",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "check": "vp check",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "prepare": "husky"
-  }
+	"type": "module",
+	"scripts": {
+		"dev": "vp dev",
+		"build": "vp build",
+		"start": "vp dev --host 0.0.0.0",
+		"deploy": "alchemy deploy alchemy/alchemy.run.ts",
+		"destroy": "alchemy destroy alchemy/alchemy.run.ts",
+		"infra:dev": "alchemy dev alchemy/alchemy.run.ts",
+		"cf-typegen": "wrangler types",
+		"lint": "oxlint",
+		"lint:fix": "oxlint --fix",
+		"format": "oxfmt",
+		"format:check": "oxfmt --check",
+		"check": "vp check",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"prepare": "husky"
+	}
 }
 ```
 
@@ -258,25 +258,25 @@ Create `src/libs/schemas/paste.ts` using Zod:
 
 ```ts
 export const PasteLanguageSchema = z.enum([
-  "auto",
-  "markdown",
-  "typescript",
-  "javascript",
-  "json",
-  "html",
-  "css",
-  "bash",
-  "text",
+	"auto",
+	"markdown",
+	"typescript",
+	"javascript",
+	"json",
+	"html",
+	"css",
+	"bash",
+	"text",
 ]);
 
 export const CreatePasteInputSchema = z.object({
-  content: z.string().min(1).max(200_000),
-  language: PasteLanguageSchema,
-  detectedLanguage: z.string().optional(),
+	content: z.string().min(1).max(200_000),
+	language: PasteLanguageSchema,
+	detectedLanguage: z.string().optional(),
 });
 
 export const GetPasteInputSchema = z.object({
-  id: z.string().min(4).max(64),
+	id: z.string().min(4).max(64),
 });
 ```
 
@@ -286,12 +286,12 @@ Create `src/infrastructure/schemas/paste.ts`:
 
 ```ts
 export interface StoredPaste {
-  id: string;
-  content: string;
-  language: string;
-  detectedLanguage: string;
-  createdAt: string;
-  expiresAt: string;
+	id: string;
+	content: string;
+	language: string;
+	detectedLanguage: string;
+	createdAt: string;
+	expiresAt: string;
 }
 ```
 
@@ -326,16 +326,16 @@ Service shape:
 
 ```ts
 export class PasteStorageService extends Context.Service<PasteStorageService>()(
-  "PasteStorageService",
-  {
-    make: Effect.gen(function* () {
-      const create = Effect.fn("PasteStorageService.create")(function* (input) {});
-      const getById = Effect.fn("PasteStorageService.getById")(function* (id) {});
-      return { create, getById };
-    }),
-  },
+	"PasteStorageService",
+	{
+		make: Effect.gen(function* () {
+			const create = Effect.fn("PasteStorageService.create")(function* (input) {});
+			const getById = Effect.fn("PasteStorageService.getById")(function* (id) {});
+			return { create, getById };
+		}),
+	},
 ) {
-  static readonly layer = Layer.effect(this, this.make);
+	static readonly layer = Layer.effect(this, this.make);
 }
 ```
 
@@ -368,7 +368,7 @@ const AppLayer = AllServicesLive;
 const AppRuntime = ManagedRuntime.make(AppLayer as Layer.Layer<unknown, never, never>);
 
 export const runEffect = <A, E, R>(effect: Effect.Effect<A, E, R>): Promise<A> =>
-  AppRuntime.runPromise(effect as Effect.Effect<A, E, never>);
+	AppRuntime.runPromise(effect as Effect.Effect<A, E, never>);
 ```
 
 ---
@@ -393,9 +393,9 @@ Return safe shape:
 
 ```ts
 {
-  id: string;
-  url: string;
-  expiresAt: string;
+	id: string;
+	url: string;
+	expiresAt: string;
 }
 ```
 
@@ -517,7 +517,7 @@ Thin route:
 
 ```tsx
 export const Route = createFileRoute("/")({
-  component: PastePreviewPage,
+	component: PastePreviewPage,
 });
 ```
 
@@ -567,24 +567,24 @@ import { Effect } from "effect";
 import { Alchemy, Cloudflare } from "alchemy/cloudflare";
 
 export default Alchemy.Stack(
-  "paste-preview",
-  { providers: Cloudflare.providers() },
-  Effect.gen(function* () {
-    const PASTES = yield* Cloudflare.KV.Namespace("PASTES");
+	"paste-preview",
+	{ providers: Cloudflare.providers() },
+	Effect.gen(function* () {
+		const PASTES = yield* Cloudflare.KV.Namespace("PASTES");
 
-    const rateLimit = Cloudflare.RateLimit({
-      namespace_id: 1001,
-      simple: { limit: 10, period: 60 },
-    });
+		const rateLimit = Cloudflare.RateLimit({
+			namespace_id: 1001,
+			simple: { limit: 10, period: 60 },
+		});
 
-    const worker = yield* Cloudflare.Worker("paste-preview", {
-      entrypoint: "./src/worker.ts",
-      domains: ["preview.ryuko.my.id"],
-      env: { PASTES, RATE_LIMIT: rateLimit },
-    });
+		const worker = yield* Cloudflare.Worker("paste-preview", {
+			entrypoint: "./src/worker.ts",
+			domains: ["preview.ryuko.my.id"],
+			env: { PASTES, RATE_LIMIT: rateLimit },
+		});
 
-    return { url: worker.url };
-  }),
+		return { url: worker.url };
+	}),
 );
 ```
 
