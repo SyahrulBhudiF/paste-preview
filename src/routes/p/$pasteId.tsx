@@ -1,19 +1,18 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { NotFoundPaste } from "@/features/paste-preview/components/NotFoundPaste";
-import { PublicPastePreview } from "@/features/paste-preview/components/PublicPastePreview";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { PasteIdPage } from "@/features/paste-preview/paste-id";
 import { pasteQueryOptions } from "@/features/paste-preview/queries";
 
 export const Route = createFileRoute("/p/$pasteId")({
-	loader: ({ context, params }) =>
-		context.queryClient.ensureQueryData(pasteQueryOptions(params.pasteId)),
+	loader: async ({ context, params }) => {
+		const paste = await context.queryClient.ensureQueryData(pasteQueryOptions(params.pasteId));
+		if (!paste) throw notFound();
+		return paste;
+	},
 	component: PasteRoute,
 });
 
 function PasteRoute() {
-	const { pasteId } = Route.useParams();
-	const { data: paste } = useSuspenseQuery(pasteQueryOptions(pasteId));
+	const paste = Route.useLoaderData();
 
-	if (!paste) return <NotFoundPaste />;
-	return <PublicPastePreview paste={paste} />;
+	return <PasteIdPage paste={paste} />;
 }

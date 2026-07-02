@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 
 export function MarkdownPreview({ content }: { content: string }) {
 	return (
-		<article className="markdown-body max-w-none overflow-x-auto p-5">
+		<article className="markdown-body h-full max-w-none overflow-auto p-5">
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm]}
 				rehypePlugins={[rehypeSanitize, rehypeHighlight]}

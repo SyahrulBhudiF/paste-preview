@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PastePreview } from "./PastePreview";
-import { CodePreview } from "./CodePreview";
+import { CodePreview } from "@/features/paste-preview/components/code";
+import { PastePreview } from "@/features/paste-preview/components/preview";
 import { formatExpiry } from "@/libs/utils/time";
 import type { StoredPaste } from "@/infrastructure/schemas/paste";
 
-export function PublicPastePreview({ paste }: { paste: StoredPaste }) {
+export function PasteIdPage({ paste }: { paste: StoredPaste }) {
 	const [mode, setMode] = useState<"preview" | "source">("preview");
 	const language = paste.language === "auto" ? paste.detectedLanguage : paste.language;
 

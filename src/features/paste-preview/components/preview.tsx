@@ -1,5 +1,5 @@
-import { CodePreview } from "./CodePreview";
-import { MarkdownPreview } from "./MarkdownPreview";
+import { CodePreview } from "./code";
+import { MarkdownPreview } from "./markdown";
 import { isMarkdownLanguage, normalizeLanguage } from "@/features/paste-preview/language";
 
 export function PastePreview({ content, language }: { content: string; language: string }) {
