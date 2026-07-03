@@ -20,3 +20,4 @@
 # misc
 *.log
 .DS_Store
+/arch
