@@ -1,9 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import {
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+} from "@/components/ui/combobox";
 import { PastePreview } from "@/features/paste-preview/components/preview";
 import { usePasteForm } from "@/features/paste-preview/hooks/use-paste-form";
-import { PasteLanguages, type PasteLanguage } from "@/features/paste-preview/language";
+import { PasteLanguages } from "@/libs/language";
 
 export function PasteForm() {
 	const {
@@ -16,7 +23,6 @@ export function PasteForm() {
 		hasContent,
 		languageLabel,
 		previewLanguage,
-		selectedLanguage,
 		setActivePane,
 		setContent,
 		setLanguage,
@@ -26,11 +32,7 @@ export function PasteForm() {
 	return (
 		<form
 			className="mx-auto flex min-h-dvh min-w-0 w-full max-w-[1500px] flex-col gap-4 overflow-x-hidden px-4 py-4 md:h-dvh md:min-h-0 md:gap-5 md:overflow-hidden md:px-6 md:py-5 lg:px-8"
-			onSubmit={(event) => {
-				event.preventDefault();
-				event.stopPropagation();
-				void form.handleSubmit();
-			}}
+			action={() => void form.handleSubmit()}
 		>
 			{shareUrl ? (
 				<div className="rounded-3xl border border-border/80 bg-card/90 p-3 shadow-sm">
@@ -87,25 +89,36 @@ export function PasteForm() {
 			<div className="flex flex-col gap-3 rounded-3xl border border-border/80 bg-card/80 p-3 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
 				<form.Field name="language">
 					{(field) => (
-						<Select
-							value={selectedLanguage}
-							onValueChange={(value) => {
-								const next = value as PasteLanguage;
+						<Combobox
+							items={PasteLanguages}
+							value={
+								PasteLanguages.find((item) => item.value === previewLanguage) ??
+								null
+							}
+							itemToStringValue={(item) => item.label}
+							onValueChange={(item) => {
+								if (!item) return;
+								const next = item.value;
 								field.handleChange(next);
 								setLanguage(next);
 							}}
 						>
-							<SelectTrigger className="h-11 w-full rounded-2xl bg-background/80 sm:w-56">
-								<span className="truncate">{languageLabel}</span>
-							</SelectTrigger>
-							<SelectContent>
-								{PasteLanguages.map((item) => (
-									<SelectItem key={item.value} value={item.value}>
-										{item.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+							<ComboboxInput
+								aria-label="Language"
+								placeholder={languageLabel}
+								className="sm:w-56"
+							/>
+							<ComboboxContent>
+								<ComboboxEmpty>No languages found.</ComboboxEmpty>
+								<ComboboxList>
+									{(item) => (
+										<ComboboxItem key={item.value} value={item}>
+											{item.label}
+										</ComboboxItem>
+									)}
+								</ComboboxList>
+							</ComboboxContent>
+						</Combobox>
 					)}
 				</form.Field>
 				<Button
@@ -136,6 +149,7 @@ export function PasteForm() {
 						{(field) => (
 							<textarea
 								id="paste-content"
+								aria-label="Paste content"
 								value={field.state.value}
 								onChange={(event) => {
 									field.handleChange(event.target.value);

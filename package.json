@@ -17,12 +17,13 @@
 		"check": "vp run format:check && vp run lint",
 		"test": "vitest --config vitest.config.ts",
 		"test:run": "vitest run --config vitest.config.ts",
-		"prepare": "husky"
+		"prepare": "husky",
+		"doctor": "react-doctor"
 	},
 	"dependencies": {
+		"@base-ui/react": "^1.6.0",
 		"@cloudflare/vite-plugin": "latest",
 		"@effect/platform-node": "4.0.0-beta.92",
-		"@radix-ui/react-select": "latest",
 		"@radix-ui/react-slot": "latest",
 		"@tailwindcss/vite": "latest",
 		"@tanstack/react-form": "latest",
@@ -53,12 +54,14 @@
 		"wrangler": "latest"
 	},
 	"devDependencies": {
+		"@effect/vitest": "4.0.0-beta.92",
 		"@types/node": "^26.0.1",
 		"@types/react": "latest",
 		"@types/react-dom": "latest",
 		"husky": "latest",
 		"oxfmt": "latest",
 		"oxlint": "latest",
+		"react-doctor": "^0.5.8",
 		"vite-plus": "^0.2.1",
 		"vitest": "latest"
 	},

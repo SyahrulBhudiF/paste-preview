@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import {
 	normalizeLanguage,
 	PasteLanguages,
 	type PasteLanguage,
-} from "@/features/paste-preview/language";
+} from "@/libs/language";
 
 const DraftStorageKey = "paste-preview:draft";
 
@@ -23,6 +23,7 @@ const defaultValues: PasteFormValues = {
 };
 
 export function usePasteForm() {
+	const queryClient = useQueryClient();
 	const [content, setContent] = useState(defaultValues.content);
 	const [language, setLanguage] = useState<PasteLanguage>(defaultValues.language);
 	const [activePane, setActivePane] = useState<"editor" | "preview">("editor");
@@ -54,6 +55,7 @@ export function usePasteForm() {
 				},
 			}),
 		onSuccess: (result) => {
+			void queryClient.invalidateQueries({ queryKey: ["paste"] });
 			setShareUrl(result.url);
 			localStorage.removeItem(DraftStorageKey);
 		},

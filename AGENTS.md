@@ -10,6 +10,8 @@ See [CONTEXT.md](CONTEXT.md) for domain glossary. See [docs/materials/reference-
 - `vp build` — production build
 - `vp run check` — format check + lint
 - `vp run test:run` — run tests once (vitest)
+- `vp run doctor --verbose` — React Doctor full scan
+- `vp run doctor --verbose --scope changed` — React Doctor changed-files scan
 - `vp run lint:fix` — auto-fix lint issues
 - Single test: `vp run test:run -- path/to/file.test.ts`
 - Pre-commit (husky): `vp run check && vp run test:run`
@@ -20,6 +22,7 @@ See [CONTEXT.md](CONTEXT.md) for domain glossary. See [docs/materials/reference-
 - **Linter**: oxlint (`.oxlintrc.json`)
 - **Formatter**: oxfmt (`.oxfmtrc.json`)
 - **Test**: vitest (`tests/**/*.test.ts`)
+- **React diagnostics**: react-doctor (`vp run doctor --verbose`)
 - **No Bun commands**
 
 ## Folder Contract

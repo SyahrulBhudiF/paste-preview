@@ -15,10 +15,3 @@ export class PasteStorageError extends Schema.TaggedErrorClass<PasteStorageError
 		operation: Schema.String,
 	},
 ) {}
-
-export class PasteValidationError extends Schema.TaggedErrorClass<PasteValidationError>()(
-	"PasteValidationError",
-	{
-		message: Schema.String,
-	},
-) {}

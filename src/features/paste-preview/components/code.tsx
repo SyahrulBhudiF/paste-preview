@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { normalizeLanguage } from "@/features/paste-preview/language";
+import { useEffect, useState } from "react";
+import { normalizeLanguage } from "@/libs/language";
 
 const ShikiLanguageMap: Record<string, string> = {
 	auto: "text",
@@ -11,6 +11,37 @@ const ShikiLanguageMap: Record<string, string> = {
 	jsx: "jsx",
 	json: "json",
 	html: "html",
+	yaml: "yaml",
+	env: "dotenv",
+	xml: "xml",
+	java: "java",
+	nix: "nix",
+	haskell: "haskell",
+	zig: "zig",
+	c: "c",
+	"c++": "cpp",
+	"c#": "csharp",
+	python: "python",
+	sql: "sql",
+	dockerfile: "dockerfile",
+	toml: "toml",
+	ini: "ini",
+	diff: "diff",
+	log: "log",
+	scss: "scss",
+	less: "less",
+	graphql: "graphql",
+	nginx: "nginx",
+	http: "http",
+	ruby: "ruby",
+	kotlin: "kotlin",
+	swift: "swift",
+	scala: "scala",
+	lua: "lua",
+	perl: "perl",
+	terraform: "terraform",
+	makefile: "makefile",
+	powershell: "powershell",
 	vue: "vue",
 	astro: "astro",
 	svelte: "svelte",
@@ -32,10 +63,7 @@ const escapeHtml = (value: string) =>
 export function CodePreview({ content, language }: { content: string; language: string }) {
 	const normalized = normalizeLanguage(language);
 	const shikiLanguage = ShikiLanguageMap[normalized] ?? "text";
-	const fallbackHtml = useMemo(
-		() => `<pre class="shiki"><code>${escapeHtml(content)}</code></pre>`,
-		[content],
-	);
+	const fallbackHtml = `<pre class="shiki"><code>${escapeHtml(content)}</code></pre>`;
 	const [highlightedHtml, setHighlightedHtml] = useState(fallbackHtml);
 
 	useEffect(() => {

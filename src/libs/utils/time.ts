@@ -1,11 +1,13 @@
+const ExpiryDateFormatter = new Intl.DateTimeFormat("en", {
+	month: "short",
+	day: "numeric",
+	year: "numeric",
+});
+
 export const formatExpiry = (expiresAt: string, now = new Date()) => {
 	const expires = new Date(expiresAt);
 	const diffMs = expires.getTime() - now.getTime();
-	const exact = new Intl.DateTimeFormat("en", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	}).format(expires);
+	const exact = ExpiryDateFormatter.format(expires);
 
 	if (diffMs <= 0) return `Expired (${exact})`;
 
