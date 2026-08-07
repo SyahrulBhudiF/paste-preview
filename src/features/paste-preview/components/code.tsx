@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { normalizeLanguage } from "@/libs/language";
+import { highlighter, isHighlightSupported, toHighlightLanguage } from "@/libs/highlight";
 
 const ShikiLanguageMap: Record<string, string> = {
 	auto: "text",
@@ -60,10 +61,21 @@ const escapeHtml = (value: string) =>
 		.replaceAll('"', "&quot;")
 		.replaceAll("'", "&#039;");
 
-export function CodePreview({ content, language }: { content: string; language: string }) {
-	const normalized = normalizeLanguage(language);
-	const shikiLanguage = ShikiLanguageMap[normalized] ?? "text";
-	const fallbackHtml = `<pre class="shiki"><code>${escapeHtml(content)}</code></pre>`;
+function CodeFrame({ html }: { html: string }) {
+	return (
+		<div className="h-full w-full max-w-full overflow-auto p-5 font-mono text-sm leading-7">
+			<div
+				className="min-w-max [&_pre]:m-0 [&_code]:font-mono"
+				dangerouslySetInnerHTML={{ __html: html }}
+			/>
+		</div>
+	);
+}
+
+// ponytail: lazy shiki fallback for ~25 languages TanStack Highlight doesn't
+// ship. Loaded only when one is actually pasted; swap out when highlight adds them.
+function ShikiCode({ content, language }: { content: string; language: string }) {
+	const fallbackHtml = `<pre><code>${escapeHtml(content)}</code></pre>`;
 	const [highlightedHtml, setHighlightedHtml] = useState(fallbackHtml);
 
 	useEffect(() => {
@@ -72,7 +84,7 @@ export function CodePreview({ content, language }: { content: string; language: 
 		const highlight = async () => {
 			const { codeToHtml } = await import("shiki");
 			const html = await codeToHtml(content, {
-				lang: shikiLanguage,
+				lang: language,
 				theme: "github-light",
 			});
 
@@ -87,7 +99,7 @@ export function CodePreview({ content, language }: { content: string; language: 
 		return () => {
 			cancelled = true;
 		};
-	}, [content, fallbackHtml, shikiLanguage]);
+	}, [content, fallbackHtml, language]);
 
 	return (
 		<div className="h-full w-full max-w-full overflow-auto p-5 font-mono text-sm leading-7">
@@ -97,4 +109,21 @@ export function CodePreview({ content, language }: { content: string; language: 
 			/>
 		</div>
 	);
+}
+
+export function CodePreview({ content, language }: { content: string; language: string }) {
+	const normalized = normalizeLanguage(language);
+	const shikiLanguage = ShikiLanguageMap[normalized] ?? "text";
+
+	if (isHighlightSupported(normalized)) {
+		return (
+			<CodeFrame
+				html={highlighter.highlightToHtml(content, {
+					lang: toHighlightLanguage(normalized),
+				})}
+			/>
+		);
+	}
+
+	return <ShikiCode content={content} language={shikiLanguage} />;
 }

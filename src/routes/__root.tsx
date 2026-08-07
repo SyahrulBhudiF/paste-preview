@@ -5,6 +5,7 @@ import { ErrorPage } from "@/routes/error-page";
 import { NotFoundPage } from "@/routes/not-found-page";
 import "github-markdown-css/github-markdown-light.css";
 import "@/styles/app.css";
+import { highlightThemeCss } from "@/libs/highlight";
 
 interface RouterContext {
 	queryClient: QueryClient;
@@ -48,6 +49,7 @@ function RootDocument() {
 				<HeadContent />
 			</head>
 			<body>
+				<style>{highlightThemeCss}</style>
 				<Outlet />
 				<Toaster position="bottom-right" richColors />
 				<Scripts />
