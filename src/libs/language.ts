@@ -112,7 +112,7 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	if (!trimmed) return "text";
 
 	if (/^diff --git\b|^@@\s+-\d+,\d+\s+\+\d+,\d+\s+@@/m.test(trimmed)) return "diff";
-	if (/^[A-Z_][A-Z0-9_]*=.*/m.test(trimmed)) return "env";
+	if (!looksLikeMarkdown(trimmed) && /^[A-Z_][A-Z0-9_]*=.*/m.test(trimmed)) return "env";
 	if (
 		/^<\?xml\b|^<(?!(?:html|div|section|article|main|script|style|p|h\d)\b)([A-Za-z_][\w.-]*)(?:\s[^>]*)?>[\s\S]*<\/\1>$/i.test(
 			trimmed,
@@ -163,8 +163,9 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	if (/\b(object\s+\w+|val\s+\w+\s*=)/m.test(trimmed)) return "scala";
 	if (/\b(class\s+\w+\s*<|puts\s+)|#\{[^}]+\}/m.test(trimmed)) return "ruby";
 	if (/^#!.*\bpython\b|\bdef\s+\w+\s*\(|\bfrom\s+\w+\s+import\b/m.test(trimmed)) return "python";
-	if (/^\s*\[[\w.-]+\]\s*$|^\s*[\w.-]+\s*=\s*.+$/m.test(trimmed)) return "toml";
-	if (/^\s*[\w.-]+:\s+.+$/m.test(trimmed)) return "yaml";
+	if (!looksLikeMarkdown(trimmed) && /^\s*\[[\w.-]+\]\s*$|^\s*[\w.-]+\s*=\s*.+$/m.test(trimmed))
+		return "toml";
+	if (!looksLikeMarkdown(trimmed) && /^\s*[\w.-]+:\s+.+$/m.test(trimmed)) return "yaml";
 	if (/^\s*\$\w+\s*=|\bWrite-Host\b|\bGet-\w+\b/.test(trimmed)) return "powershell";
 	if (/\bimport\s+Swift\b|\bfunc\s+\w+\s*\([^)]*\)\s*\{[\s\S]*\bprint\s*\(/m.test(trimmed))
 		return "swift";
