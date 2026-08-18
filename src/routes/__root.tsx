@@ -1,8 +1,8 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
 import { Toaster } from "sonner";
-import { ErrorPage } from "@/routes/error-page";
-import { NotFoundPage } from "@/routes/not-found-page";
+import { ErrorPage } from "@/routes/-error-page";
+import { NotFoundPage } from "@/routes/-not-found-page";
 import "github-markdown-css/github-markdown-light.css";
 import "@/styles/app.css";
 import { highlightThemeCss } from "@/libs/highlight";
