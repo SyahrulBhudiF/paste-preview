@@ -195,9 +195,9 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	)
 		return "typescript";
 	if (/\b(function|const|let|var|=>)\b/.test(trimmed)) return "javascript";
+	if (looksLikeMarkdown(trimmed)) return "markdown";
 	if (/^\s*(npm|pnpm|vp|git|cd|mkdir|curl|echo|go|cargo|rustc|php)\b/m.test(trimmed))
 		return "bash";
 	if (/[.#][\w-]+\s*\{/.test(trimmed)) return "css";
-	if (looksLikeMarkdown(trimmed)) return "markdown";
 	return "text";
 };

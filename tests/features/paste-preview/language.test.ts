@@ -102,6 +102,11 @@ const conflictCases = [
 	],
 	["plain sentence with colon stays text", "plain key: value inside a sentence", "text"],
 	["markdown beats yaml colon", "# Setup\n\nRun: npm install", "markdown"],
+	[
+		"markdown beats bash commands",
+		"# Setup\n\nnpm install\n\ngit clone https://example.com/x",
+		"markdown",
+	],
 ] as const;
 
 const aliasCases = [
