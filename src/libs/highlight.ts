@@ -27,7 +27,6 @@ import { createThemeCss } from "@tanstack/highlight/theme";
 import { githubDarkTheme } from "@tanstack/highlight/themes/github-dark";
 import { githubLightTheme } from "@tanstack/highlight/themes/github-light";
 import type { CodeHighlighter } from "@tanstack/markdown";
-import type { PasteLanguage } from "@/libs/schemas/paste";
 
 export const highlighter = createHighlighter({
 	fallbackLanguage: "plaintext",
@@ -60,34 +59,34 @@ export const highlightMarkdownCode: CodeHighlighter =
 	createTanStackMarkdownHighlighter(highlighter);
 
 // App languages covered by TanStack Highlight. Anything else falls back to Shiki.
-const HighlightLanguageMap: Partial<Record<PasteLanguage, string>> = {
-	text: "plaintext",
-	markdown: "markdown",
-	diff: "diff",
-	env: "env",
-	toml: "toml",
-	yaml: "yaml",
-	json: "json",
-	html: "html",
-	css: "css",
-	javascript: "js",
-	typescript: "ts",
-	jsx: "jsx",
-	tsx: "tsx",
-	vue: "vue",
-	svelte: "svelte",
-	http: "http",
-	bash: "shell",
-	dockerfile: "dockerfile",
-	nginx: "nginx",
-	sql: "sql",
-	python: "python",
-};
+const HighlightLanguageMap = new Map<string, string>([
+	["text", "plaintext"],
+	["markdown", "markdown"],
+	["diff", "diff"],
+	["env", "env"],
+	["toml", "toml"],
+	["yaml", "yaml"],
+	["json", "json"],
+	["html", "html"],
+	["css", "css"],
+	["javascript", "js"],
+	["typescript", "ts"],
+	["jsx", "jsx"],
+	["tsx", "tsx"],
+	["vue", "vue"],
+	["svelte", "svelte"],
+	["http", "http"],
+	["bash", "shell"],
+	["dockerfile", "dockerfile"],
+	["nginx", "nginx"],
+	["sql", "sql"],
+	["python", "python"],
+]);
 
-export const isHighlightSupported = (language: string) => language in HighlightLanguageMap;
+export const isHighlightSupported = (language: string) => HighlightLanguageMap.has(language);
 
 export const toHighlightLanguage = (language: string) =>
-	HighlightLanguageMap[language as PasteLanguage] ?? "plaintext";
+	HighlightLanguageMap.get(language) ?? "plaintext";
 
 // Theme CSS: defaults target pre.th-code for standalone blocks; the
 // .markdown-renderer rules target Markdown-owned code containers.

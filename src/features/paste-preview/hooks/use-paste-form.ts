@@ -85,7 +85,7 @@ export function usePasteForm() {
 		if (!raw) return;
 
 		try {
-			const draft = JSON.parse(raw) as Partial<PasteFormValues>;
+			const draft: Partial<PasteFormValues> = JSON.parse(raw);
 			const draftContent = draft.content ?? "";
 			const draftLanguage = draft.language ? normalizeLanguage(draft.language) : "auto";
 

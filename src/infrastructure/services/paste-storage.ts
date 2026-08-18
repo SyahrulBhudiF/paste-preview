@@ -1,12 +1,16 @@
 import { env } from "cloudflare:workers";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 import { nanoid } from "nanoid";
 import { PasteTtlSeconds, ProductionOrigin } from "@/infrastructure/config/paste";
 import { PasteNotFoundError, PasteStorageError } from "@/infrastructure/errors/paste";
 import type { CreatePasteInput } from "@/libs/schemas/paste";
-import type { CreatedPaste, StoredPaste } from "@/infrastructure/schemas/paste";
+import {
+	StoredPasteSchema,
+	type CreatedPaste,
+	type StoredPaste,
+} from "@/infrastructure/schemas/paste";
 
-export interface PasteStorageServiceShape {
+export interface PasteStorageServiceContract {
 	create: (input: CreatePasteInput) => Effect.Effect<CreatedPaste, PasteStorageError>;
 	getById: (id: string) => Effect.Effect<StoredPaste, PasteNotFoundError | PasteStorageError>;
 }
@@ -14,12 +18,9 @@ export interface PasteStorageServiceShape {
 const pasteKey = (id: string) => `paste:${id}`;
 const DevPasteStore = new Map<string, string>();
 
-const getOrigin = () => {
-	if (typeof location !== "undefined") return location.origin;
-	return ProductionOrigin;
-};
+const getOrigin = () => ("location" in globalThis ? globalThis.location.origin : ProductionOrigin);
 
-const create: PasteStorageServiceShape["create"] = (input) =>
+const create: PasteStorageServiceContract["create"] = (input) =>
 	Effect.tryPromise({
 		try: async () => {
 			const id = nanoid(10);
@@ -56,7 +57,7 @@ const create: PasteStorageServiceShape["create"] = (input) =>
 			}),
 	});
 
-const getById: PasteStorageServiceShape["getById"] = (id) =>
+const getById: PasteStorageServiceContract["getById"] = (id) =>
 	Effect.tryPromise({
 		try: async () => {
 			const value = env.PASTES
@@ -69,7 +70,8 @@ const getById: PasteStorageServiceShape["getById"] = (id) =>
 				});
 			}
 
-			return JSON.parse(value) as StoredPaste;
+			const parsed = Schema.decodeUnknownSync(StoredPasteSchema)(JSON.parse(value));
+			return parsed;
 		},
 		catch: (cause) => {
 			if (cause instanceof PasteNotFoundError) return cause;
@@ -82,7 +84,7 @@ const getById: PasteStorageServiceShape["getById"] = (id) =>
 
 export class PasteStorageService extends Context.Service<
 	PasteStorageService,
-	PasteStorageServiceShape
+	PasteStorageServiceContract
 >()("PasteStorageService", {
 	make: Effect.succeed({ create, getById }),
 }) {

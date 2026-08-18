@@ -57,38 +57,37 @@ export const PasteLanguages: Array<{ value: PasteLanguage; label: string }> = la
 	([value, label]) => ({ value, label }),
 );
 
-const PasteLanguageValues = new Set<PasteLanguage>(PasteLanguages.map((item) => item.value));
-
-const LanguageAliases: Record<string, PasteLanguage> = {
-	cc: "c++",
-	cpp: "c++",
-	cs: "c#",
-	csharp: "c#",
-	cxx: "c++",
-	docker: "dockerfile",
-	dotenv: "env",
-	gql: "graphql",
-	golang: "go",
-	hs: "haskell",
-	js: "javascript",
-	make: "makefile",
-	ps: "powershell",
-	ps1: "powershell",
-	py: "python",
-	rs: "rust",
-	sh: "bash",
-	shell: "bash",
-	tf: "terraform",
-	ts: "typescript",
-	yml: "yaml",
-	zsh: "bash",
-};
+const LanguageAliases = new Map<string, PasteLanguage>([
+	["cc", "c++"],
+	["cpp", "c++"],
+	["cs", "c#"],
+	["csharp", "c#"],
+	["cxx", "c++"],
+	["docker", "dockerfile"],
+	["dotenv", "env"],
+	["gql", "graphql"],
+	["golang", "go"],
+	["hs", "haskell"],
+	["js", "javascript"],
+	["make", "makefile"],
+	["ps", "powershell"],
+	["ps1", "powershell"],
+	["py", "python"],
+	["rs", "rust"],
+	["sh", "bash"],
+	["shell", "bash"],
+	["tf", "terraform"],
+	["ts", "typescript"],
+	["yml", "yaml"],
+	["zsh", "bash"],
+]);
 
 export const normalizeLanguage = (language: string): PasteLanguage => {
 	const value = language.toLowerCase().trim();
-	const alias = LanguageAliases[value];
+	const alias = LanguageAliases.get(value);
 	if (alias) return alias;
-	if (PasteLanguageValues.has(value as PasteLanguage)) return value as PasteLanguage;
+	const match = PasteLanguages.find((option) => option.value === value);
+	if (match) return match.value;
 	return "text";
 };
 

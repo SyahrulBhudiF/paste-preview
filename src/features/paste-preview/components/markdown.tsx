@@ -2,7 +2,7 @@ import { Markdown, type MarkdownComponents } from "@tanstack/markdown/react";
 import { highlightMarkdownCode } from "@/libs/highlight";
 
 const components = {
-	a(props) {
+	a({ children, ...props }) {
 		const hasProtocol = /^[a-z][a-z0-9+.-]*:/i.test(props.href || "");
 		const allowed = !hasProtocol || /^(https?:|mailto:)/i.test(props.href || "");
 		const href = allowed ? props.href : undefined;
@@ -14,7 +14,9 @@ const components = {
 				href={href}
 				rel={external ? "nofollow noopener noreferrer" : props.rel}
 				target={external ? "_blank" : props.target}
-			/>
+			>
+				{children}
+			</a>
 		);
 	},
 } satisfies MarkdownComponents;

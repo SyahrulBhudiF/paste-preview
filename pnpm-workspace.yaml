@@ -2,6 +2,10 @@ minimumReleaseAge: 10080
 trustPolicy: no-downgrade
 trustLockfile: true
 
+overrides:
+    "@cloudflare/vite-plugin": 1.49.0
+    miniflare: 4.20260730.0
+
 allowBuilds:
     "@parcel/watcher": true
     esbuild: true

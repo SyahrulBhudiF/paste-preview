@@ -1,5 +1,4 @@
-import { Effect } from "effect";
-import { describe, expect, it } from "@effect/vitest";
+import { describe, expect, it } from "vitest";
 import { detectPasteLanguage, normalizeLanguage, PasteLanguages } from "@/libs/language";
 
 const positiveCases = [
@@ -117,43 +116,33 @@ const aliasCases = [
 
 describe("language utilities", () => {
 	for (const [language, content] of positiveCases) {
-		it.effect(`detects ${language}`, () =>
-			Effect.sync(() => {
-				expect(detectPasteLanguage(content)).toBe(language);
-			}),
-		);
+		it(`detects ${language}`, () => {
+			expect(detectPasteLanguage(content)).toBe(language);
+		});
 	}
 
-	it.effect("has a detection fixture for every non-auto language", () =>
-		Effect.sync(() => {
-			const tested = new Set(positiveCases.map(([language]) => language));
-			const missing = PasteLanguages.map((item) => item.value).filter(
-				(language) => language !== "auto" && !tested.has(language),
-			);
+	it("has a detection fixture for every non-auto language", () => {
+		const tested = new Set(positiveCases.map(([language]) => language));
+		const missing = PasteLanguages.map((item) => item.value).filter(
+			(language) => language !== "auto" && !tested.has(language),
+		);
 
-			expect(missing).toEqual([]);
-		}),
-	);
+		expect(missing).toEqual([]);
+	});
 
 	for (const [name, content, language] of conflictCases) {
-		it.effect(`handles conflict: ${name}`, () =>
-			Effect.sync(() => {
-				expect(detectPasteLanguage(content)).toBe(language);
-			}),
-		);
+		it(`handles conflict: ${name}`, () => {
+			expect(detectPasteLanguage(content)).toBe(language);
+		});
 	}
 
-	it.effect("keeps generic text as text", () =>
-		Effect.sync(() => {
-			expect(detectPasteLanguage("nothing special here")).toBe("text");
-		}),
-	);
+	it("keeps generic text as text", () => {
+		expect(detectPasteLanguage("nothing special here")).toBe("text");
+	});
 
 	for (const [alias, language] of aliasCases) {
-		it.effect(`normalizes ${alias} to ${language}`, () =>
-			Effect.sync(() => {
-				expect(normalizeLanguage(alias)).toBe(language);
-			}),
-		);
+		it(`normalizes ${alias} to ${language}`, () => {
+			expect(normalizeLanguage(alias)).toBe(language);
+		});
 	}
 });

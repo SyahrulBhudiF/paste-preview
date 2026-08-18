@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { normalizeLanguage } from "@/libs/language";
 import { highlighter, isHighlightSupported, toHighlightLanguage } from "@/libs/highlight";
 
-const ShikiLanguageMap: Record<string, string> = {
+const ShikiLanguageMap = {
 	auto: "text",
 	text: "text",
 	markdown: "markdown",
@@ -51,7 +51,7 @@ const ShikiLanguageMap: Record<string, string> = {
 	go: "go",
 	rust: "rust",
 	php: "php",
-};
+} satisfies Record<string, string>;
 
 const escapeHtml = (value: string) =>
 	value
