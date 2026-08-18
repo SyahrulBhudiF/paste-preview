@@ -12,3 +12,6 @@ allowBuilds:
     msgpackr-extract: true
     sharp: true
     workerd: true
+
+patchedDependencies:
+    html-preview-sandbox@0.2.0: patches/html-preview-sandbox@0.2.0.patch

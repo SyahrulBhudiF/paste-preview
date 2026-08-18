@@ -13,7 +13,7 @@ export function HtmlPreview({
 
 	return (
 		<SafeHtmlPreview
-			className={`h-full w-full overflow-auto ${heightClass} [&>iframe]:!h-full`}
+			className={`h-full w-full overflow-auto ${heightClass}`}
 			csp="offline"
 			sanitize={{ allowScripts: false, allowInlineEvents: false }}
 			source={content}

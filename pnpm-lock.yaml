@@ -8,6 +8,9 @@ overrides:
   '@cloudflare/vite-plugin': 1.49.0
   miniflare: 4.20260730.0
 
+patchedDependencies:
+  html-preview-sandbox@0.2.0: 9e4a27ee53a1f6b708e69e19eaf1b3f5e45ce9e2918fec5db736bac1b447f172
+
 importers:
 
   .:
@@ -65,7 +68,7 @@ importers:
         version: 5.9.0
       html-preview-sandbox:
         specifier: ^0.2.0
-        version: 0.2.0(react@19.2.8)
+        version: 0.2.0(patch_hash=9e4a27ee53a1f6b708e69e19eaf1b3f5e45ce9e2918fec5db736bac1b447f172)(react@19.2.8)
       lucide-react:
         specifier: latest
         version: 1.31.0(react@19.2.8)
@@ -8374,7 +8377,7 @@ snapshots:
     transitivePeerDependencies:
       - '@noble/hashes'
 
-  html-preview-sandbox@0.2.0(react@19.2.8):
+  html-preview-sandbox@0.2.0(patch_hash=9e4a27ee53a1f6b708e69e19eaf1b3f5e45ce9e2918fec5db736bac1b447f172)(react@19.2.8):
     dependencies:
       dompurify: 3.4.13
       jsdom: 29.1.1
