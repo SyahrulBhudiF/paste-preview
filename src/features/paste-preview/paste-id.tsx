@@ -62,7 +62,7 @@ export function PasteIdPage({ paste }: { paste: StoredPaste }) {
 				<section className="rounded-3xl border border-border/80 bg-card/85 shadow-sm backdrop-blur">
 					{mode === "preview" ? (
 						<div className="p-5">
-							<PastePreview content={paste.content} language={language} />
+							<PastePreview content={paste.content} language={language} fullHeight />
 						</div>
 					) : (
 						<CodePreview content={paste.content} language={language} />
