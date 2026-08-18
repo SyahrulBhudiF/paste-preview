@@ -92,6 +92,7 @@ export const normalizeLanguage = (language: string): PasteLanguage => {
 };
 
 export const isMarkdownLanguage = (language: string) => normalizeLanguage(language) === "markdown";
+export const isHtmlLanguage = (language: string) => normalizeLanguage(language) === "html";
 
 const looksLikeMarkdown = (content: string) => {
 	const trimmed = content.trim();
