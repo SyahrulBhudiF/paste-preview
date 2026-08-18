@@ -13,6 +13,7 @@ const positiveCases = [
 	["json", '{ "ok": true }'],
 	["xml", "<app>\n  <name>PastePreview</name>\n  <port>3000</port>\n</app>"],
 	["html", "<main>Hi</main>"],
+	["html", '<!doctype html>\n<html><body><div class="hero">Hi</div></body></html>'],
 	["css", ".card { color: red; }"],
 	["scss", "$color: red;\n.card { color: $color; }"],
 	["less", "@color: red;\n.card { color: @color; }"],
@@ -65,6 +66,7 @@ const conflictCases = [
 	["scss beats yaml colon", "$primary: #6366f1;\n.button {\n  background: $primary;\n}", "scss"],
 	["less beats yaml colon", "@primary: #6366f1;\n.button { color: @primary; }", "less"],
 	["html beats generic xml", "<main>HTML, not XML</main>", "html"],
+	["html beats jsx heuristics", '<div class="hero">{content}</div>', "html"],
 	["xml works without declaration", "<app>\n  <name>PastePreview</name>\n</app>", "xml"],
 	["astro beats yaml frontmatter", "---\ntitle: Hi\n---\n<div>Astro</div>", "astro"],
 	[

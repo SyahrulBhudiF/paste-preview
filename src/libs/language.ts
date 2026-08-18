@@ -137,6 +137,12 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	if (/\{#(if|each|await)\b|\bon:click=|\bclass:/.test(trimmed)) return "svelte";
 	if (/<template[\s\S]*>[\s\S]*<\/template>|defineProps\s*\(|defineEmits\s*\(/i.test(trimmed))
 		return "vue";
+	if (
+		/^<!doctype\s+html\b|^<html(?:\s[^>]*)?>|^<(?:head|body|header|nav|footer|form|button|input|img|table|ul|ol|li|a|h[1-6]|div|section|article|main|script|style|p)\b/i.test(
+			trimmed,
+		)
+	)
+		return "html";
 
 	const hasJsx = /<\w[\w.]*[\s\S]*>|<\/\w+>/.test(trimmed);
 	if (
@@ -188,7 +194,6 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	if (/\b(using\s+System;|namespace\s+\w+|Console\.WriteLine)\b/.test(trimmed)) return "c#";
 
 	if (/^\s*[[{]/.test(trimmed)) return "json";
-	if (/^\s*<(html|div|section|article|main|script|style|p|h\d)\b/i.test(trimmed)) return "html";
 	if (
 		/\b(import\s+.+\s+from|export\s+(function|const|class|type|interface)|interface\s+\w+|type\s+\w+\s*=)\b/.test(
 			trimmed,
