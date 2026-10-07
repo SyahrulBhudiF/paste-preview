@@ -26,8 +26,8 @@
 		"@effect/platform-node": "4.0.0-beta.92",
 		"@radix-ui/react-slot": "latest",
 		"@tailwindcss/vite": "latest",
-		"@tanstack/highlight": "^0.0.9",
-		"@tanstack/markdown": "^0.0.12",
+		"@tanstack/highlight": "^1.0.0",
+		"@tanstack/markdown": "^1.0.0",
 		"@tanstack/react-form": "latest",
 		"@tanstack/react-query": "latest",
 		"@tanstack/react-router": "latest",
@@ -63,7 +63,7 @@
 		"oxlint": "latest",
 		"react-doctor": "^0.5.8",
 		"vite-plus": "^0.2.1",
-		"vitest": "latest"
+		"vitest": "4.1.10"
 	},
 	"packageManager": "pnpm@11.9.0"
 }
