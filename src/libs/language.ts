@@ -127,7 +127,11 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	if (/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\S+\s+HTTP\/\d(?:\.\d)?/m.test(trimmed))
 		return "http";
 	if (/\b(query|mutation|fragment)\s+\w*\s*(\([^)]*\))?\s*\{/m.test(trimmed)) return "graphql";
-	if (/^[\w./-]+:\s*(?:\n|$)|^\s*\.PHONY:/m.test(trimmed)) return "makefile";
+	if (
+		/^\s*\.PHONY:/m.test(trimmed) ||
+		(/^\t+\S/m.test(trimmed) && /^[\w./-]+:\s*(?:\n|$)/m.test(trimmed))
+	)
+		return "makefile";
 	if (/\bimport\s+<nixpkgs>|\bmkDerivation\b|\bbuildInputs\s*=|\bpkgs\.\w+/m.test(trimmed))
 		return "nix";
 	if (/\b(#include\s+<\w+>|std::|using\s+namespace\s+std)\b/.test(trimmed)) return "c++";
@@ -155,14 +159,14 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 
 	if (/\b(SELECT|INSERT INTO|UPDATE|DELETE FROM|CREATE TABLE|ALTER TABLE)\b/i.test(trimmed))
 		return "sql";
-	if (/\b(ERROR|WARN|INFO|DEBUG)\b.*\d{2}:\d{2}:\d{2}|^\[[A-Z]+\]\s+/m.test(trimmed))
-		return "log";
-	if (/^\s*;.+$/m.test(trimmed)) return "ini";
 	if (
-		/\b(module\s+\w+\s+where|\w+\s*::|\bwhere\b|\bderiving\s+\(|putStrLn\b)|^(?!(?:const|local|function|let|val)\b)\w+\s+\w+\s*=/m.test(
-			trimmed,
-		)
+		/\b(?:ERROR|WARN|INFO|DEBUG|TRACE|FATAL)\b/.test(trimmed) &&
+		/\d{2}:\d{2}:\d{2}/.test(trimmed)
 	)
+		return "log";
+	if (/^\[[A-Z]+\]\s+/m.test(trimmed)) return "log";
+	if (/^\s*;.+$/m.test(trimmed)) return "ini";
+	if (/\b(module\s+\w+\s+where|\w+\s*::|\bderiving\s*\(|putStrLn\b)/m.test(trimmed))
 		return "haskell";
 	if (/@[\w-]+:\s*[^;]+;/.test(trimmed)) return "less";
 	if (/\$[\w-]+:\s*[^;]+;|[.#][\w-]+\s*\{[\s\S]*&[\s\S]*\}/.test(trimmed)) return "scss";
@@ -172,7 +176,12 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	if (/^#!.*\bpython\b|\bdef\s+\w+\s*\(|\bfrom\s+\w+\s+import\b/m.test(trimmed)) return "python";
 	if (!looksLikeMarkdown(trimmed) && /^\s*\[[\w.-]+\]\s*$|^\s*[\w.-]+\s*=\s*.+$/m.test(trimmed))
 		return "toml";
-	if (!looksLikeMarkdown(trimmed) && /^\s*[\w.-]+:\s+.+$/m.test(trimmed)) return "yaml";
+	if (
+		!looksLikeMarkdown(trimmed) &&
+		!/[{};]/.test(trimmed) &&
+		/^\s*[\w.-]+:[ \t]+\S/m.test(trimmed)
+	)
+		return "yaml";
 	if (/^\s*\$\w+\s*=|\bWrite-Host\b|\bGet-\w+\b/.test(trimmed)) return "powershell";
 	if (/\bimport\s+Swift\b|\bfunc\s+\w+\s*\([^)]*\)\s*\{[\s\S]*\bprint\s*\(/m.test(trimmed))
 		return "swift";
@@ -195,7 +204,7 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 
 	if (/^\s*[[{]/.test(trimmed)) return "json";
 	if (
-		/\b(import\s+.+\s+from|export\s+(function|const|class|type|interface)|interface\s+\w+|type\s+\w+\s*=)\b/.test(
+		/\b(import\s+.+\s+from|export\s+(?:function|const|class|type|interface)|interface\s+\w+|type\s+\w+\s*=)/.test(
 			trimmed,
 		)
 	)

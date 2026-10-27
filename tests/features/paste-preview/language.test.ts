@@ -109,6 +109,24 @@ const conflictCases = [
 		"# Setup\n\nnpm install\n\ngit clone https://example.com/x",
 		"markdown",
 	],
+	[
+		"typescript type alias beats haskell equation",
+		"type Foo = { a: number };\nconst x: Foo = { a: 1 };",
+		"typescript",
+	],
+	[
+		"typescript object beats yaml colon",
+		"import { z } from 'zod';\n\nexport interface User {\n  id: string;\n}",
+		"typescript",
+	],
+	[
+		"css declaration beats yaml colon",
+		".a {\n  color: red;\n}\n\n.b {\n  color: blue;\n}",
+		"css",
+	],
+	["yaml bare key beats makefile target", "on:\n  push:\n    branches: [main]", "yaml"],
+	["prose with where stays text", "we met where the road bends", "text"],
+	["log timestamp before level", "2026-10-27 12:00:00 ERROR something failed", "log"],
 ] as const;
 
 const aliasCases = [
