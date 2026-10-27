@@ -96,4 +96,5 @@ export const highlightThemeCss = [
 		codeBlockSelector: ".markdown-renderer pre.tm-code",
 		lineNumbersSelector: ".markdown-renderer .tm-code--line-numbers",
 	}),
+	".th-code { padding: 0 !important; }",
 ].join("\n");

@@ -63,9 +63,9 @@ const escapeHtml = (value: string) =>
 
 function CodeFrame({ html }: { html: string }) {
 	return (
-		<div className="h-full w-full max-w-full overflow-auto p-5 font-mono text-sm leading-7">
+		<div className="h-full w-full max-w-full overflow-auto p-2 font-mono text-sm leading-7">
 			<div
-				className="min-w-max [&_pre]:m-0 [&_code]:font-mono"
+				className="h-full min-h-0 min-w-full w-max [&_code]:font-mono [&_pre]:m-0 [&_pre]:p-0 [&_pre]:size-full"
 				dangerouslySetInnerHTML={{ __html: html }}
 			/>
 		</div>
@@ -102,9 +102,9 @@ function ShikiCode({ content, language }: { content: string; language: string })
 	}, [content, fallbackHtml, language]);
 
 	return (
-		<div className="h-full w-full max-w-full overflow-auto p-5 font-mono text-sm leading-7">
+		<div className="h-full w-full max-w-full overflow-auto p-2 font-mono text-sm leading-7">
 			<div
-				className="min-w-max [&_.shiki]:bg-transparent! [&_.shiki]:outline-none [&_code]:font-mono [&_pre]:m-0"
+				className="h-full min-h-0 min-w-full w-max [&_.shiki]:bg-transparent! [&_.shiki]:outline-none [&_code]:font-mono [&_pre]:m-0 [&_pre]:p-0 [&_pre]:size-full"
 				dangerouslySetInnerHTML={{ __html: highlightedHtml }}
 			/>
 		</div>
@@ -120,6 +120,7 @@ export function CodePreview({ content, language }: { content: string; language: 
 			<CodeFrame
 				html={highlighter.highlightToHtml(content, {
 					lang: toHighlightLanguage(normalized),
+					lineNumbers: true,
 				})}
 			/>
 		);
