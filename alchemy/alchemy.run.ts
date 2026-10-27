@@ -24,7 +24,7 @@ export default Alchemy.Stack(
 				PASTES,
 				RATE_LIMIT,
 			},
-			domain: ["preview.ryuko.my.id"],
+			domain: "preview.ryuko.my.id",
 			compatibility: {
 				flags: ["nodejs_compat"],
 			},

@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-export class PasteNotFoundError extends Schema.TaggedErrorClass<PasteNotFoundError>()(
+export class PasteNotFoundError extends Schema.TaggedError<PasteNotFoundError>()(
 	"PasteNotFoundError",
 	{
 		message: Schema.String,
@@ -8,7 +8,7 @@ export class PasteNotFoundError extends Schema.TaggedErrorClass<PasteNotFoundErr
 	},
 ) {}
 
-export class PasteStorageError extends Schema.TaggedErrorClass<PasteStorageError>()(
+export class PasteStorageError extends Schema.TaggedError<PasteStorageError>()(
 	"PasteStorageError",
 	{
 		message: Schema.String,
