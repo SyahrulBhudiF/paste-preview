@@ -112,6 +112,16 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	const trimmed = content.trim();
 	if (!trimmed) return "text";
 
+	if (/^[[{]/.test(trimmed)) {
+		try {
+			JSON.parse(trimmed);
+			return "json";
+		} catch {
+			// Incomplete JSON and brace-based languages still need the rules below.
+		}
+	}
+
+	if (/^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[ \t]*$/m.test(trimmed)) return "markdown";
 	if (/^diff --git\b|^@@\s+-\d+,\d+\s+\+\d+,\d+\s+@@/m.test(trimmed)) return "diff";
 	if (!looksLikeMarkdown(trimmed) && /^[A-Z_][A-Z0-9_]*=.*/m.test(trimmed)) return "env";
 	if (
@@ -132,10 +142,19 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 		(/^\t+\S/m.test(trimmed) && /^[\w./-]+:\s*(?:\n|$)/m.test(trimmed))
 	)
 		return "makefile";
-	if (/\bimport\s+<nixpkgs>|\bmkDerivation\b|\bbuildInputs\s*=|\bpkgs\.\w+/m.test(trimmed))
+	if (
+		/\bimport\s+<nixpkgs>|\bmkDerivation\b|\bbuildInputs\s*=|\bpkgs\.\w+|^\s*(?:inputs|outputs)\s*=/m.test(
+			trimmed,
+		)
+	)
 		return "nix";
-	if (/\b(#include\s+<\w+>|std::|using\s+namespace\s+std)\b/.test(trimmed)) return "c++";
-	if (/\b#include\s+[<"]\w+\.h[>"]|\bint\s+main\s*\(/.test(trimmed)) return "c";
+	if (
+		/^\s*#\s*include\s*<[^>/.]+>|^\s*#\s*include\s*[<"][^>"]+\.(?:hpp|hh|hxx)[>"]|\bstd::|\busing\s+namespace\s+std\b/m.test(
+			trimmed,
+		)
+	)
+		return "c++";
+	if (/^\s*#\s*include\s*[<"][^>"]+\.h[>"]|\bint\s+main\s*\(/m.test(trimmed)) return "c";
 	if (/^---[\s\S]*---\s*\n[\s\S]*<\w+|<\w+[\s\S]*\bclient:(load|idle|visible)\b/.test(trimmed))
 		return "astro";
 	if (/\{#(if|each|await)\b|\bon:click=|\bclass:/.test(trimmed)) return "svelte";
@@ -204,12 +223,17 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 
 	if (/^\s*[[{]/.test(trimmed)) return "json";
 	if (
-		/\b(import\s+.+\s+from|export\s+(?:function|const|class|type|interface)|interface\s+\w+|type\s+\w+\s*=)/.test(
+		/\b(import\s+type\b|interface\s+\w+|type\s+\w+\s*=|(?:const|let|var)\s+\w+\s*:\s*\w+|function\s+\w+\s*\([^)]*:\s*\w+)|\)\s*:\s*\w+\s*(?:=>|\{)/.test(
 			trimmed,
 		)
 	)
 		return "typescript";
-	if (/\b(function|const|let|var|=>)\b/.test(trimmed)) return "javascript";
+	if (
+		/\b(import\s+.+\s+from|export\s+(?:function|const|class)|function|const|let|var)\b|=>/.test(
+			trimmed,
+		)
+	)
+		return "javascript";
 	if (looksLikeMarkdown(trimmed)) return "markdown";
 	if (/^\s*(npm|pnpm|vp|git|cd|mkdir|curl|echo|go|cargo|rustc|php)\b/m.test(trimmed))
 		return "bash";

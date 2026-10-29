@@ -6,20 +6,28 @@ import { isHtmlLanguage, isMarkdownLanguage, normalizeLanguage } from "@/libs/la
 export function PastePreview({
 	content,
 	language,
-	fullHeight = false,
+	showLineNumbers = true,
+	wrap = false,
 }: {
 	content: string;
 	language: string;
-	fullHeight?: boolean;
+	showLineNumbers?: boolean;
+	wrap?: boolean;
 }) {
 	const normalized = normalizeLanguage(language);
 
 	if (!content.trim()) {
-		return <p className="p-5 text-sm text-muted-foreground">Nothing to preview yet.</p>;
+		return <p className="px-3 py-2 text-xs text-muted-foreground">Nothing to preview yet.</p>;
 	}
 
 	if (isMarkdownLanguage(normalized)) return <MarkdownPreview content={content} />;
-	if (isHtmlLanguage(normalized))
-		return <HtmlPreview content={content} fullHeight={fullHeight} />;
-	return <CodePreview content={content} language={normalized} />;
+	if (isHtmlLanguage(normalized)) return <HtmlPreview content={content} />;
+	return (
+		<CodePreview
+			content={content}
+			language={normalized}
+			showLineNumbers={showLineNumbers}
+			wrap={wrap}
+		/>
+	);
 }

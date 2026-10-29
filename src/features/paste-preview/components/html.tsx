@@ -9,18 +9,10 @@ function sanitizeDocument(content: string) {
 	});
 }
 
-export function HtmlPreview({
-	content,
-	fullHeight = false,
-}: {
-	content: string;
-	fullHeight?: boolean;
-}) {
-	const heightClass = fullHeight ? "h-[calc(100dvh-12rem)]" : "h-[32rem]";
-
+export function HtmlPreview({ content }: { content: string }) {
 	return (
 		<iframe
-			className={`block w-full overflow-auto border-0 bg-white ${heightClass}`}
+			className="block h-full w-full border-0 bg-white"
 			title="HTML preview sandbox"
 			sandbox=""
 			srcDoc={sanitizeDocument(content)}

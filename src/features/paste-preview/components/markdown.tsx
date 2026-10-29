@@ -24,7 +24,7 @@ function CopyableCodeBlock({ className, ...props }: ComponentPropsWithoutRef<"pr
 		<div className="group relative">
 			<button
 				aria-label={copied ? "Code copied" : "Copy code"}
-				className="absolute right-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-md border border-border bg-card/90 px-2 py-1 text-xs text-muted-foreground opacity-70 shadow-sm backdrop-blur transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+				className="absolute right-2 top-2 z-10 inline-flex items-center gap-1.5 border border-border bg-card px-2 py-1 text-xs text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 				onClick={() => void copyCode()}
 				type="button"
 			>
@@ -59,7 +59,7 @@ const components = {
 
 export function MarkdownPreview({ content }: { content: string }) {
 	return (
-		<article className="markdown-renderer markdown-body h-full max-w-none overflow-auto p-5">
+		<article className="markdown-renderer markdown-body h-full max-w-none overflow-auto p-3 sm:p-4">
 			<Markdown
 				highlighter={highlightMarkdownCode}
 				codeLineNumbers

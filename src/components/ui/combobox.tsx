@@ -12,12 +12,15 @@ export function ComboboxInput({
 		<div className="relative">
 			<ComboboxPrimitive.Input
 				className={cn(
-					"flex h-11 w-full rounded-2xl border border-input bg-background/80 px-3 pr-9 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+					"flex h-8 w-full rounded-sm border border-input bg-card px-2 pr-7 text-xs outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
 					className,
 				)}
 				{...props}
 			/>
-			<ComboboxPrimitive.Trigger className="absolute inset-y-0 right-2 flex items-center text-muted-foreground">
+			<ComboboxPrimitive.Trigger
+				aria-label="Choose language"
+				className="absolute inset-y-0 right-2 flex items-center text-muted-foreground"
+			>
 				<ChevronDownIcon className="size-4" />
 			</ComboboxPrimitive.Trigger>
 		</div>
@@ -33,7 +36,7 @@ export function ComboboxContent({
 			<ComboboxPrimitive.Positioner sideOffset={6} className="z-50">
 				<ComboboxPrimitive.Popup
 					className={cn(
-						"max-h-96 w-[var(--anchor-width)] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95",
+						"max-h-96 min-w-44 w-[var(--anchor-width)] overflow-hidden rounded-sm border border-border bg-popover text-popover-foreground",
 						className,
 					)}
 					{...props}

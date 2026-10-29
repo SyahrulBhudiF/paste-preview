@@ -16,7 +16,7 @@ export function ErrorPage() {
 						<p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">
 							Try again, or go back to the editor.
 						</p>
-						<Button asChild className="mt-8 rounded-2xl px-5">
+						<Button asChild className="mt-8">
 							<Link to="/">Back to editor</Link>
 						</Button>
 					</div>

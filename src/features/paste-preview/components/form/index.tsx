@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
 	Combobox,
@@ -8,9 +10,12 @@ import {
 	ComboboxItem,
 	ComboboxList,
 } from "@/components/ui/combobox";
+import { CodeEditor } from "@/features/paste-preview/components/code-editor";
+import { CodeOptions } from "@/features/paste-preview/components/code-options";
 import { PastePreview } from "@/features/paste-preview/components/preview";
 import { usePasteForm } from "@/features/paste-preview/hooks/use-paste-form";
 import { PasteLanguages } from "@/libs/language";
+import { cn } from "@/libs/utils/cn";
 
 export function PasteForm() {
 	const {
@@ -23,77 +28,46 @@ export function PasteForm() {
 		hasContent,
 		languageLabel,
 		previewLanguage,
+		selectedLanguage,
 		setActivePane,
 		setContent,
 		setLanguage,
 		shareUrl,
 	} = usePasteForm();
+	const [showLineNumbers, setShowLineNumbers] = useState(true);
+	const [wrap, setWrap] = useState(false);
+	const lineCount = content.split("\n").length;
+
+	const copySource = async () => {
+		try {
+			await navigator.clipboard.writeText(content);
+			toast.success("Source copied");
+		} catch {
+			toast.error("Could not copy source");
+		}
+	};
 
 	return (
 		<form
-			className="mx-auto flex min-h-dvh min-w-0 w-full max-w-[1500px] flex-col gap-4 overflow-x-hidden px-4 py-4 md:h-dvh md:min-h-0 md:gap-5 md:overflow-hidden md:px-6 md:py-5 lg:px-8"
+			className="flex h-full min-h-0 min-w-0 flex-col px-2 pb-2 sm:px-3 sm:pb-3"
 			action={() => void form.handleSubmit()}
 		>
-			{shareUrl ? (
-				<div className="rounded-3xl border border-border/80 bg-card/90 p-3 shadow-sm">
-					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-						<div className="min-w-0 flex-1">
-							<p className="text-xs font-medium text-muted-foreground">
-								Public preview link
-							</p>
-							<Link
-								className="block truncate text-sm text-primary underline-offset-4 hover:underline"
-								to={shareUrl}
-							>
-								{shareUrl}
-							</Link>
-						</div>
-						<Button
-							type="button"
-							size="sm"
-							variant="secondary"
-							className="h-9 rounded-2xl px-4"
-							onClick={copyShareUrl}
-						>
-							Copy link
-						</Button>
-					</div>
-				</div>
-			) : null}
-
-			{error ? (
-				<p className="rounded-2xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-					{error}
-				</p>
-			) : null}
-
-			<div className="grid grid-cols-2 gap-2 rounded-2xl border bg-card/70 p-1 md:hidden">
-				<Button
-					type="button"
-					variant={activePane === "editor" ? "default" : "ghost"}
-					className="rounded-xl"
-					onClick={() => setActivePane("editor")}
-				>
-					Editor
-				</Button>
-				<Button
-					type="button"
-					variant={activePane === "preview" ? "default" : "ghost"}
-					className="rounded-xl"
-					onClick={() => setActivePane("preview")}
-				>
-					Preview
-				</Button>
-			</div>
-
-			<div className="flex flex-col gap-3 rounded-3xl border border-border/80 bg-card/80 p-3 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+			<header className="app-header">
+				<h1 className="app-wordmark">
+					paste<span>/</span>preview
+				</h1>
 				<form.Field name="language">
 					{(field) => (
 						<Combobox
 							items={PasteLanguages}
 							value={
-								PasteLanguages.find((item) => item.value === previewLanguage) ??
+								PasteLanguages.find((item) => item.value === selectedLanguage) ??
 								null
+							}
+							itemToStringLabel={(item) =>
+								item.value === "auto" && selectedLanguage === "auto"
+									? languageLabel
+									: item.label
 							}
 							itemToStringValue={(item) => item.label}
 							onValueChange={(item) => {
@@ -106,7 +80,7 @@ export function PasteForm() {
 							<ComboboxInput
 								aria-label="Language"
 								placeholder={languageLabel}
-								className="sm:w-56"
+								className="w-26 min-[380px]:w-32 sm:w-44"
 							/>
 							<ComboboxContent>
 								<ComboboxEmpty>No languages found.</ComboboxEmpty>
@@ -121,66 +95,132 @@ export function PasteForm() {
 						</Combobox>
 					)}
 				</form.Field>
+				<span className="ml-auto hidden text-xs text-muted-foreground sm:block">
+					Expires in 7 days
+				</span>
 				<Button
 					type="submit"
+					size="sm"
 					disabled={createPasteMutation.isPending || !hasContent}
-					className="h-11 w-full rounded-2xl px-5 shadow-sm transition-transform active:scale-[0.98] sm:w-auto"
+					className="ml-auto shrink-0 sm:ml-0"
 				>
 					{createPasteMutation.isPending ? "Saving..." : "Save & share"}
 				</Button>
-			</div>
+			</header>
 
-			<div className="grid min-h-[min(34rem,calc(100dvh-14rem))] min-w-0 flex-1 gap-5 md:min-h-0 md:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-				<section
-					className={
-						activePane === "preview"
-							? "hidden md:flex md:min-h-0 md:min-w-0 md:flex-col"
-							: "flex min-h-0 min-w-0 flex-col"
-					}
+			{shareUrl ? (
+				<output className="mb-2 flex min-w-0 items-center gap-3 border border-border bg-secondary px-3 py-1.5 text-xs">
+					<span className="shrink-0 text-muted-foreground">Public link</span>
+					<Link
+						className="min-w-0 flex-1 truncate text-primary underline underline-offset-4"
+						to={shareUrl}
+					>
+						{shareUrl}
+					</Link>
+					<Button type="button" size="sm" variant="ghost" onClick={copyShareUrl}>
+						Copy link
+					</Button>
+				</output>
+			) : null}
+			{error ? (
+				<p
+					role="alert"
+					className="mb-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
 				>
-					<div className="mb-3">
-						<label className="text-sm font-semibold" htmlFor="paste-content">
-							Paste Preview
-						</label>
-						<p className="text-xs text-muted-foreground">Source · expires in 7 days</p>
-					</div>
+					{error}
+				</p>
+			) : null}
 
+			<fieldset
+				className="flex min-w-0 shrink-0 border border-b-0 border-border bg-secondary/50 md:hidden"
+				aria-label="Visible pane"
+			>
+				<button
+					className="pane-tab"
+					type="button"
+					aria-pressed={activePane === "editor"}
+					onClick={() => setActivePane("editor")}
+				>
+					Source
+				</button>
+				<button
+					className="pane-tab"
+					type="button"
+					aria-pressed={activePane === "preview"}
+					onClick={() => setActivePane("preview")}
+				>
+					Preview
+				</button>
+			</fieldset>
+			<div className="grid min-h-0 min-w-0 flex-1 border border-border bg-card md:grid-cols-2">
+				<section
+					aria-label="Source editor"
+					className={cn(
+						"min-h-0 min-w-0 flex-col md:flex",
+						activePane === "editor" ? "flex" : "hidden",
+					)}
+				>
+					<div className="pane-toolbar">
+						<label className="pane-label" htmlFor="paste-content">
+							Source
+						</label>
+						<CodeOptions
+							showLineNumbers={showLineNumbers}
+							onLineNumbersChange={setShowLineNumbers}
+							wrap={wrap}
+							onWrapChange={setWrap}
+						/>
+					</div>
 					<form.Field name="content">
 						{(field) => (
-							<textarea
-								id="paste-content"
-								aria-label="Paste content"
-								value={field.state.value}
-								onChange={(event) => {
-									field.handleChange(event.target.value);
-									setContent(event.target.value);
+							<CodeEditor
+								content={field.state.value}
+								onChange={(value) => {
+									field.handleChange(value);
+									setContent(value);
 								}}
-								className="min-h-0 flex-1 resize-none overflow-auto rounded-3xl border border-border/80 bg-card/90 p-5 font-mono text-sm leading-7 shadow-sm outline-none ring-offset-background transition focus:border-primary/70 focus:ring-4 focus:ring-primary/15"
-								placeholder="Paste code, Markdown, JSON, shell commands, or notes..."
-								spellCheck={false}
+								showLineNumbers={showLineNumbers}
+								wrap={wrap}
 							/>
 						)}
 					</form.Field>
 				</section>
-
 				<section
-					className={
-						activePane === "editor"
-							? "hidden md:flex md:min-h-0 md:min-w-0 md:flex-col"
-							: "flex min-h-0 min-w-0 flex-col"
-					}
+					aria-label="Live preview"
+					className={cn(
+						"min-h-0 min-w-0 flex-col md:flex md:border-l md:border-border",
+						activePane === "preview" ? "flex" : "hidden",
+					)}
 				>
-					<div className="mb-3">
-						<h2 className="text-sm font-semibold">Preview</h2>
-						<p className="text-xs text-muted-foreground">
-							{content.length.toLocaleString()} chars
-						</p>
+					<div className="pane-toolbar">
+						<h2 className="pane-label">Preview</h2>
+						<button
+							className="code-action"
+							type="button"
+							onClick={copySource}
+							disabled={!hasContent}
+						>
+							Copy
+						</button>
 					</div>
-					<div className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden rounded-3xl border border-border/80 bg-card/85 shadow-sm backdrop-blur">
-						<PastePreview content={content} language={previewLanguage} />
+					<div className="min-h-0 min-w-0 flex-1 overflow-hidden">
+						<PastePreview
+							content={content}
+							language={previewLanguage}
+							showLineNumbers={showLineNumbers}
+							wrap={wrap}
+						/>
 					</div>
 				</section>
 			</div>
+			<footer className="workspace-status">
+				<span>
+					{lineCount.toLocaleString()} lines · {content.length.toLocaleString()}{" "}
+					characters · UTF-8
+				</span>
+				<span className="hidden sm:inline">{languageLabel}</span>
+				<span className="sm:hidden">Expires in 7 days</span>
+			</footer>
 		</form>
 	);
 }

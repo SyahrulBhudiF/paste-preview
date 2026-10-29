@@ -17,10 +17,10 @@ export function NotFoundPage() {
 							This link may be wrong, deleted, or past its expiry window.
 						</p>
 						<div className="mt-8 flex flex-col gap-3 sm:flex-row">
-							<Button asChild className="rounded-2xl px-5">
+							<Button asChild>
 								<Link to="/">Create new paste</Link>
 							</Button>
-							<Button asChild variant="secondary" className="rounded-2xl px-5">
+							<Button asChild variant="secondary">
 								<Link to="/">Back to editor</Link>
 							</Button>
 						</div>

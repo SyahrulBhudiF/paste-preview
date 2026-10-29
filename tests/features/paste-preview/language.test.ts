@@ -127,6 +127,46 @@ const conflictCases = [
 	["yaml bare key beats makefile target", "on:\n  push:\n    branches: [main]", "yaml"],
 	["prose with where stays text", "we met where the road bends", "text"],
 	["log timestamp before level", "2026-10-27 12:00:00 ERROR something failed", "log"],
+	[
+		"nix flake beats toml assignments and json braces",
+		'{\n  description = "ryuko nix config";\n  inputs = {\n    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";\n  };\n  outputs = inputs@{ nixpkgs, ... }: {};\n}',
+		"nix",
+	],
+	[
+		"c++ standard header beats shared int main",
+		"#include <iostream>\nint main() { return 0; }",
+		"c++",
+	],
+	[
+		"c header without main is still c",
+		'#include <stdio.h>\nvoid greet(void) { puts("hello"); }',
+		"c",
+	],
+	[
+		"javascript imports do not imply typescript",
+		'import { readFile } from "node:fs/promises";\nexport const read = () => readFile("notes.txt", "utf8");',
+		"javascript",
+	],
+	[
+		"typed variable distinguishes typescript from javascript",
+		'const name: string = "Ryuko";\nconsole.log(name);',
+		"typescript",
+	],
+	[
+		"json string values do not imply sql",
+		'{ "query": "SELECT id FROM users", "enabled": true }',
+		"json",
+	],
+	[
+		"markdown fenced javascript stays a markdown document",
+		"# Example\n\n```js\nconst message = 'hello';\nconsole.log(message);\n```",
+		"markdown",
+	],
+	[
+		"standalone fenced c++ stays markdown",
+		"```cpp\n#include <iostream>\nint main() { return 0; }\n```",
+		"markdown",
+	],
 ] as const;
 
 const aliasCases = [

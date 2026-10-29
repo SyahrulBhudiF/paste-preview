@@ -61,22 +61,42 @@ const escapeHtml = (value: string) =>
 		.replaceAll('"', "&quot;")
 		.replaceAll("'", "&#039;");
 
-function CodeFrame({ html }: { html: string }) {
+interface CodePreviewProps {
+	content: string;
+	language: string;
+	showLineNumbers?: boolean;
+	wrap?: boolean;
+}
+
+function CodeFrame({
+	html,
+	showLineNumbers,
+	wrap,
+}: {
+	html: string;
+	showLineNumbers: boolean;
+	wrap: boolean;
+}) {
 	return (
-		<div className="h-full w-full max-w-full overflow-auto p-2 font-mono text-sm leading-7">
-			<div
-				className="h-full min-h-0 min-w-full w-max [&_code]:font-mono [&_pre]:m-0 [&_pre]:p-0 [&_pre]:size-full"
-				dangerouslySetInnerHTML={{ __html: html }}
-			/>
-		</div>
+		<div
+			className="code-viewer"
+			data-line-numbers={showLineNumbers}
+			data-wrap={wrap}
+			dangerouslySetInnerHTML={{ __html: html }}
+		/>
 	);
 }
 
-// ponytail: lazy shiki fallback for ~25 languages TanStack Highlight doesn't
-// ship. Loaded only when one is actually pasted; swap out when highlight adds them.
-function ShikiCode({ content, language }: { content: string; language: string }) {
-	const fallbackHtml = `<pre><code>${escapeHtml(content)}</code></pre>`;
-	const [highlightedHtml, setHighlightedHtml] = useState(fallbackHtml);
+function ShikiCode({ content, language, showLineNumbers = true, wrap = false }: CodePreviewProps) {
+	const fallbackHtml = `<pre><code>${content
+		.split("\n")
+		.map((line) => `<span class="line">${escapeHtml(line)}</span>`)
+		.join("\n")}</code></pre>`;
+	const [highlighted, setHighlighted] = useState<{
+		content: string;
+		language: string;
+		html: string;
+	} | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -88,43 +108,53 @@ function ShikiCode({ content, language }: { content: string; language: string })
 				theme: "github-light",
 			});
 
-			if (!cancelled) setHighlightedHtml(html);
+			if (!cancelled) setHighlighted({ content, language, html });
 		};
 
-		setHighlightedHtml(fallbackHtml);
 		void highlight().catch(() => {
-			if (!cancelled) setHighlightedHtml(fallbackHtml);
+			if (!cancelled) setHighlighted(null);
 		});
 
 		return () => {
 			cancelled = true;
 		};
-	}, [content, fallbackHtml, language]);
+	}, [content, language]);
 
-	return (
-		<div className="h-full w-full max-w-full overflow-auto p-2 font-mono text-sm leading-7">
-			<div
-				className="h-full min-h-0 min-w-full w-max [&_.shiki]:bg-transparent! [&_.shiki]:outline-none [&_code]:font-mono [&_pre]:m-0 [&_pre]:p-0 [&_pre]:size-full"
-				dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-			/>
-		</div>
-	);
+	const html =
+		highlighted?.content === content && highlighted.language === language
+			? highlighted.html
+			: fallbackHtml;
+
+	return <CodeFrame html={html} showLineNumbers={showLineNumbers} wrap={wrap} />;
 }
 
-export function CodePreview({ content, language }: { content: string; language: string }) {
+export function CodePreview({
+	content,
+	language,
+	showLineNumbers = true,
+	wrap = false,
+}: CodePreviewProps) {
 	const normalized = normalizeLanguage(language);
 	const shikiLanguage = ShikiLanguageMap[normalized] ?? "text";
 
 	if (isHighlightSupported(normalized)) {
-		return (
-			<CodeFrame
-				html={highlighter.highlightToHtml(content, {
-					lang: toHighlightLanguage(normalized),
-					lineNumbers: true,
-				})}
-			/>
-		);
+		const html = highlighter.highlightToHtml(content, {
+			lang: toHighlightLanguage(normalized),
+			lineNumbers: true,
+		});
+		const numberedHtml = content.endsWith("\n")
+			? html.replace("</code>", '<span class="th-line"></span></code>')
+			: html;
+
+		return <CodeFrame html={numberedHtml} showLineNumbers={showLineNumbers} wrap={wrap} />;
 	}
 
-	return <ShikiCode content={content} language={shikiLanguage} />;
+	return (
+		<ShikiCode
+			content={content}
+			language={shikiLanguage}
+			showLineNumbers={showLineNumbers}
+			wrap={wrap}
+		/>
+	);
 }

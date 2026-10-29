@@ -51,7 +51,11 @@ function RootDocument() {
 			<body>
 				<style>{highlightThemeCss}</style>
 				<Outlet />
-				<Toaster position="bottom-right" richColors />
+				<Toaster
+					position="bottom-right"
+					richColors
+					toastOptions={{ style: { borderRadius: "var(--radius)", boxShadow: "none" } }}
+				/>
 				<Scripts />
 			</body>
 		</html>
