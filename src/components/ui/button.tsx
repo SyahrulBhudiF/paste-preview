@@ -1,42 +1,21 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cn } from "@/libs/utils/cn";
+import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { buttonVariants, type ButtonSize, type ButtonVariant } from "./button-variants";
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-	asChild?: boolean;
-	variant?: "default" | "secondary" | "ghost" | "outline" | "destructive";
-	size?: "default" | "sm";
+type ButtonProps = Omit<ButtonPrimitive.Props, "className" | "render"> & {
+	className?: string;
+	variant?: ButtonVariant;
+	size?: ButtonSize;
 };
 
-const variants = {
-	default: "bg-primary text-primary-foreground hover:bg-primary/90",
-	secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-	ghost: "hover:bg-accent hover:text-accent-foreground",
-	outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-	destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-};
-
-const sizes = {
-	default: "h-9 px-3 py-1.5",
-	sm: "h-8 px-3 text-xs",
-};
-
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
-		const Comp = asChild ? Slot : "button";
-		return (
-			<Comp
-				ref={ref}
-				className={cn(
-					"inline-flex items-center justify-center gap-2 rounded-sm text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
-					variants[variant],
-					sizes[size],
-					className,
-				)}
-				{...props}
-			/>
-		);
-	},
+export const Button = React.forwardRef<HTMLElement, ButtonProps>(
+	({ className, variant = "default", size = "default", ...props }, ref) => (
+		<ButtonPrimitive
+			ref={ref}
+			className={buttonVariants({ className, variant, size })}
+			{...props}
+		/>
+	),
 );
 
 Button.displayName = "Button";

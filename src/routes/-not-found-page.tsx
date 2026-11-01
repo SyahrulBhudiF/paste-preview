@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 
 export function NotFoundPage() {
 	return (
@@ -17,12 +17,12 @@ export function NotFoundPage() {
 							This link may be wrong, deleted, or past its expiry window.
 						</p>
 						<div className="mt-8 flex flex-col gap-3 sm:flex-row">
-							<Button asChild>
-								<Link to="/">Create new paste</Link>
-							</Button>
-							<Button asChild variant="secondary">
-								<Link to="/">Back to editor</Link>
-							</Button>
+							<Link className={buttonVariants()} to="/">
+								Create new paste
+							</Link>
+							<Link className={buttonVariants({ variant: "secondary" })} to="/">
+								Back to editor
+							</Link>
 						</div>
 					</div>
 				</section>

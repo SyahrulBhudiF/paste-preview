@@ -83,10 +83,10 @@
 	--secondary: #eaf1f9;
 	--secondary-foreground: #385573;
 	--muted: #eef3f8;
-	--muted-foreground: #647990;
+	--muted-foreground: #566d85;
 	--accent: #e2edfa;
 	--accent-foreground: #314f72;
-	--destructive: oklch(0.6332 0.1578 22.6734);
+	--destructive: #bd3f3f;
 	--destructive-foreground: oklch(0.9777 0.0041 301.4256);
 	--border: #d1ddeb;
 	--input: #c9d8e8;

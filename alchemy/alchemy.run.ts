@@ -17,12 +17,17 @@ export default Alchemy.Stack(
 			namespaceId: 1001,
 			simple: { limit: 10, period: 60 },
 		});
+		const PASTE_UNLOCK_RATE_LIMIT = Cloudflare.RateLimit("PASTE_UNLOCK_RATE_LIMIT", {
+			namespaceId: 1002,
+			simple: { limit: 100, period: 60 },
+		});
 
 		const worker = yield* Cloudflare.Website.Vite("paste-preview", {
 			name: "paste-preview",
 			env: {
 				PASTES,
 				RATE_LIMIT,
+				PASTE_UNLOCK_RATE_LIMIT,
 			},
 			domain: "preview.ryuko.my.id",
 			compatibility: {

@@ -1,8 +1,11 @@
 # Paste Preview — Agent Rules
 
-Cloudflare Worker app: TanStack Start + Effect-TS + Tailwind v4. Paste snippets stored in KV, shared via public URL.
+Cloudflare Worker app: TanStack Start + Effect-TS + Tailwind v4. Paste snippets
+are stored in KV and shared through public URLs.
 
-See [CONTEXT.md](CONTEXT.md) for domain glossary. See [docs/materials/reference-code-style.md](docs/materials/reference-code-style.md) for detailed style reference.
+Read [.agents/CONTEXT.md](.agents/CONTEXT.md) for architecture and domain
+decisions. Use the matching workflow in `.agents/skills/` when building server
+features, web features, or verifying changes.
 
 ## Commands
 
@@ -29,7 +32,7 @@ See [CONTEXT.md](CONTEXT.md) for domain glossary. See [docs/materials/reference-
 
 ```
 src/apis/                 Server functions
-src/components/           Shared UI (shadcn/Radix)
+src/components/ui/        Shared UI primitives (Base UI)
 src/features/             Feature modules
 src/infrastructure/       Effect services, errors, schemas, config
 src/libs/                 Client utils, schemas
@@ -96,9 +99,10 @@ export class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
 
 - Prefer theme tokens: `bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-card`
 - Use `cn()` from `@/libs/utils/cn` for conditional classes
-- shadcn components in `src/components/ui/`
+- Shared UI primitives in `src/components/ui/` use Base UI
 - Feature components in `src/features/*/components/`
 - Route components stay thin — delegate to features
+- Use Sonner for user-facing business-process success and failure feedback; keep actionable form errors inline
 
 ## Validation
 
@@ -116,4 +120,3 @@ export class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
 ## Git
 
 - Pre-commit hook: format check + lint + tests
-- No `.cursor` or `.github/copilot-instructions.md` rules present

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 
 export function ErrorPage() {
 	return (
@@ -16,9 +16,9 @@ export function ErrorPage() {
 						<p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">
 							Try again, or go back to the editor.
 						</p>
-						<Button asChild className="mt-8">
-							<Link to="/">Back to editor</Link>
-						</Button>
+						<Link className={buttonVariants({ className: "mt-8" })} to="/">
+							Back to editor
+						</Link>
 					</div>
 				</section>
 			</div>

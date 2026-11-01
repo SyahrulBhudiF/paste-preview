@@ -53,7 +53,7 @@ function RootDocument() {
 				<Outlet />
 				<Toaster
 					position="bottom-right"
-					richColors
+					offset={{ bottom: 40 }}
 					toastOptions={{ style: { borderRadius: "var(--radius)", boxShadow: "none" } }}
 				/>
 				<Scripts />

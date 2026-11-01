@@ -53,10 +53,39 @@ const PasteLanguageSchema = Schema.Union([
 
 export type PasteLanguage = Schema.Schema.Type<typeof PasteLanguageSchema>;
 
+const PasteExpirySchema = Schema.Union([
+	Schema.Literal("1h"),
+	Schema.Literal("1d"),
+	Schema.Literal("7d"),
+	Schema.Literal("30d"),
+]);
+
+export type PasteExpiry = Schema.Schema.Type<typeof PasteExpirySchema>;
+export const DefaultPasteExpiry: PasteExpiry = "7d";
+
+export const PasteExpiryOptions: Array<{ value: PasteExpiry; label: string }> = [
+	{ value: "1h", label: "1 hour" },
+	{ value: "1d", label: "1 day" },
+	{ value: "7d", label: "7 days" },
+	{ value: "30d", label: "30 days" },
+];
+
+const PasteDraftSchema = Schema.Struct({
+	content: Schema.optional(Schema.String),
+	language: Schema.optional(Schema.String),
+	title: Schema.optional(Schema.String),
+	expiresIn: Schema.optional(PasteExpirySchema),
+});
+
+export const parsePasteDraft = Schema.decodeUnknownSync(PasteDraftSchema);
+
 const CreatePasteInputSchema = Schema.Struct({
 	content: Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(200_000)),
 	language: PasteLanguageSchema,
 	detectedLanguage: Schema.optional(Schema.String),
+	title: Schema.optional(Schema.String.check(Schema.isMaxLength(120))),
+	expiresIn: Schema.optional(PasteExpirySchema),
+	password: Schema.optional(Schema.String.check(Schema.isMinLength(8), Schema.isMaxLength(128))),
 });
 
 export type CreatePasteInput = Schema.Schema.Type<typeof CreatePasteInputSchema>;
@@ -67,5 +96,13 @@ const GetPasteInputSchema = Schema.Struct({
 
 export type GetPasteInput = Schema.Schema.Type<typeof GetPasteInputSchema>;
 
+const UnlockPasteInputSchema = Schema.Struct({
+	id: GetPasteInputSchema.fields.id,
+	password: Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(128)),
+});
+
+export type UnlockPasteInput = Schema.Schema.Type<typeof UnlockPasteInputSchema>;
+
 export const parseCreatePasteInput = Schema.decodeUnknownSync(CreatePasteInputSchema);
 export const parseGetPasteInput = Schema.decodeUnknownSync(GetPasteInputSchema);
+export const parseUnlockPasteInput = Schema.decodeUnknownSync(UnlockPasteInputSchema);

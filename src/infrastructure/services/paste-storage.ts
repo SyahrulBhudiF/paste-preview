@@ -1,18 +1,26 @@
 import { env } from "cloudflare:workers";
 import { Context, Effect, Layer, Schema } from "effect";
 import { nanoid } from "nanoid";
-import { PasteTtlSeconds, ProductionOrigin } from "@/infrastructure/config/paste";
+import { PasteExpirySeconds, ProductionOrigin } from "@/infrastructure/config/paste";
+import { createPasswordVerifier } from "@/infrastructure/crypto/password";
 import { PasteNotFoundError, PasteStorageError } from "@/infrastructure/errors/paste";
-import type { CreatePasteInput } from "@/libs/schemas/paste";
+import { unlockStoredPaste } from "@/infrastructure/services/paste-unlock";
+import {
+	DefaultPasteExpiry,
+	type CreatePasteInput,
+	type UnlockPasteInput,
+} from "@/libs/schemas/paste";
 import {
 	StoredPasteSchema,
 	type CreatedPaste,
+	type PasteUnlockResult,
 	type StoredPaste,
 } from "@/infrastructure/schemas/paste";
 
 export interface PasteStorageServiceContract {
 	create: (input: CreatePasteInput) => Effect.Effect<CreatedPaste, PasteStorageError>;
 	getById: (id: string) => Effect.Effect<StoredPaste, PasteNotFoundError | PasteStorageError>;
+	unlock: (input: UnlockPasteInput) => Effect.Effect<PasteUnlockResult, PasteStorageError>;
 }
 
 const pasteKey = (id: string) => `paste:${id}`;
@@ -25,20 +33,30 @@ const create: PasteStorageServiceContract["create"] = (input) =>
 		try: async () => {
 			const id = nanoid(10);
 			const createdAt = new Date();
-			const expiresAt = new Date(createdAt.getTime() + PasteTtlSeconds * 1000);
+			const expiresIn = input.expiresIn ?? DefaultPasteExpiry;
+			const expirationTtl = PasteExpirySeconds[expiresIn];
+			const expiresAt = new Date(createdAt.getTime() + expirationTtl * 1000);
 			const detectedLanguage = input.detectedLanguage ?? input.language;
-			const paste: StoredPaste = {
-				id,
-				content: input.content,
-				language: input.language,
-				detectedLanguage,
-				createdAt: createdAt.toISOString(),
-				expiresAt: expiresAt.toISOString(),
-			};
+			const title = input.title?.trim();
+			const passwordVerifier = input.password
+				? await createPasswordVerifier(input.password)
+				: undefined;
+			const paste: StoredPaste = Object.assign(
+				{
+					id,
+					content: input.content,
+					language: input.language,
+					detectedLanguage,
+					createdAt: createdAt.toISOString(),
+					expiresAt: expiresAt.toISOString(),
+				},
+				title ? { title } : undefined,
+				passwordVerifier ? { passwordVerifier } : undefined,
+			);
 
 			if (env.PASTES) {
 				await env.PASTES.put(pasteKey(id), JSON.stringify(paste), {
-					expirationTtl: PasteTtlSeconds,
+					expirationTtl,
 				});
 			} else {
 				DevPasteStore.set(pasteKey(id), JSON.stringify(paste));
@@ -71,6 +89,13 @@ const getById: PasteStorageServiceContract["getById"] = (id) =>
 			}
 
 			const parsed = Schema.decodeUnknownSync(StoredPasteSchema)(JSON.parse(value));
+			if (Date.parse(parsed.expiresAt) <= Date.now()) {
+				DevPasteStore.delete(pasteKey(id));
+				throw new PasteNotFoundError({
+					message: "Paste not found or expired.",
+					pasteId: id,
+				});
+			}
 			return parsed;
 		},
 		catch: (cause) => {
@@ -82,11 +107,33 @@ const getById: PasteStorageServiceContract["getById"] = (id) =>
 		},
 	});
 
+const unlock: PasteStorageServiceContract["unlock"] = Effect.fn("PasteStorageService.unlock")(
+	function* (input) {
+		const paste = yield* getById(input.id).pipe(
+			Effect.catchTag("PasteNotFoundError", () => Effect.succeed(null)),
+		);
+
+		const binding = env.PASTE_UNLOCK_RATE_LIMIT;
+		const rateLimit = binding
+			? Effect.tryPromise({
+					try: () => binding.limit({ key: `paste:${input.id}` }),
+					catch: () =>
+						new PasteStorageError({
+							message: "Could not check paste unlock limit.",
+							operation: "unlock",
+						}),
+				}).pipe(Effect.map(({ success }) => success))
+			: Effect.succeed(true);
+
+		return yield* unlockStoredPaste({ paste, input, rateLimit });
+	},
+);
+
 export class PasteStorageService extends Context.Service<
 	PasteStorageService,
 	PasteStorageServiceContract
 >()("PasteStorageService", {
-	make: Effect.succeed({ create, getById }),
+	make: Effect.succeed({ create, getById, unlock }),
 }) {
 	static readonly layer = Layer.effect(this, this.make);
 }

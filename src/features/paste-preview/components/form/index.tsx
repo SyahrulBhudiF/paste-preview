@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +13,10 @@ import {
 } from "@/components/ui/combobox";
 import { CodeEditor } from "@/features/paste-preview/components/code-editor";
 import { CodeOptions } from "@/features/paste-preview/components/code-options";
+import { PasswordDialog } from "@/features/paste-preview/components/form/password-dialog";
 import { PastePreview } from "@/features/paste-preview/components/preview";
 import { usePasteForm } from "@/features/paste-preview/hooks/use-paste-form";
+import { PasteExpiryOptions } from "@/libs/schemas/paste";
 import { PasteLanguages } from "@/libs/language";
 import { cn } from "@/libs/utils/cn";
 
@@ -24,18 +27,22 @@ export function PasteForm() {
 		copyShareUrl,
 		createPasteMutation,
 		error,
+		expiryLabel,
 		form,
 		hasContent,
 		languageLabel,
+		password,
 		previewLanguage,
 		selectedLanguage,
+		setPassword,
 		setActivePane,
 		setContent,
-		setLanguage,
+		sharePasswordProtected,
 		shareUrl,
 	} = usePasteForm();
 	const [showLineNumbers, setShowLineNumbers] = useState(true);
 	const [wrap, setWrap] = useState(false);
+	const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 	const lineCount = content.split("\n").length;
 
 	const copySource = async () => {
@@ -74,7 +81,6 @@ export function PasteForm() {
 								if (!item) return;
 								const next = item.value;
 								field.handleChange(next);
-								setLanguage(next);
 							}}
 						>
 							<ComboboxInput
@@ -95,9 +101,6 @@ export function PasteForm() {
 						</Combobox>
 					)}
 				</form.Field>
-				<span className="ml-auto hidden text-xs text-muted-foreground sm:block">
-					Expires in 7 days
-				</span>
 				<Button
 					type="submit"
 					size="sm"
@@ -107,10 +110,56 @@ export function PasteForm() {
 					{createPasteMutation.isPending ? "Saving..." : "Save & share"}
 				</Button>
 			</header>
+			<div className="flex min-w-0 flex-wrap items-center gap-2 border-x border-border bg-card px-2 py-2 sm:px-3">
+				<form.Field name="title">
+					{(field) => (
+						<input
+							aria-label="Paste title (optional)"
+							className="h-8 min-w-28 flex-1 border border-input bg-background px-2 text-xs outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+							maxLength={120}
+							placeholder="Title (optional)"
+							value={field.state.value}
+							onChange={(event) => field.handleChange(event.target.value)}
+						/>
+					)}
+				</form.Field>
+				<form.Field name="expiresIn">
+					{(field) => (
+						<select
+							aria-label="Paste expiry"
+							className="h-8 w-28 border border-input bg-background px-2 text-xs outline-none focus:border-ring focus:ring-1 focus:ring-ring"
+							value={field.state.value}
+							onChange={(event) => {
+								const selected = PasteExpiryOptions.find(
+									(option) => option.value === event.target.value,
+								);
+								if (selected) field.handleChange(selected.value);
+							}}
+						>
+							{PasteExpiryOptions.map((option) => (
+								<option key={option.value} value={option.value}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					)}
+				</form.Field>
+				<Button
+					type="button"
+					size="sm"
+					variant={password ? "secondary" : "outline"}
+					onClick={() => setPasswordDialogOpen(true)}
+				>
+					<LockKeyhole className="size-3.5" aria-hidden="true" />
+					{password ? "Password on" : "Add password"}
+				</Button>
+			</div>
 
 			{shareUrl ? (
 				<output className="mb-2 flex min-w-0 items-center gap-3 border border-border bg-secondary px-3 py-1.5 text-xs">
-					<span className="shrink-0 text-muted-foreground">Public link</span>
+					<span className="shrink-0 text-muted-foreground">
+						{sharePasswordProtected ? "Password protected" : "Public link"}
+					</span>
 					<Link
 						className="min-w-0 flex-1 truncate text-primary underline underline-offset-4"
 						to={shareUrl}
@@ -120,6 +169,11 @@ export function PasteForm() {
 					<Button type="button" size="sm" variant="ghost" onClick={copyShareUrl}>
 						Copy link
 					</Button>
+					{sharePasswordProtected ? (
+						<span className="basis-full text-muted-foreground">
+							Share the password separately.
+						</span>
+					) : null}
 				</output>
 			) : null}
 			{error ? (
@@ -175,10 +229,7 @@ export function PasteForm() {
 						{(field) => (
 							<CodeEditor
 								content={field.state.value}
-								onChange={(value) => {
-									field.handleChange(value);
-									setContent(value);
-								}}
+								onChange={setContent}
 								showLineNumbers={showLineNumbers}
 								wrap={wrap}
 							/>
@@ -219,8 +270,14 @@ export function PasteForm() {
 					characters · UTF-8
 				</span>
 				<span className="hidden sm:inline">{languageLabel}</span>
-				<span className="sm:hidden">Expires in 7 days</span>
+				<span className="sm:hidden">Expires in {expiryLabel}</span>
 			</footer>
+			<PasswordDialog
+				open={passwordDialogOpen}
+				isProtected={Boolean(password)}
+				onOpenChange={setPasswordDialogOpen}
+				onPasswordChange={setPassword}
+			/>
 		</form>
 	);
 }

@@ -12,7 +12,8 @@ export const Route = createFileRoute("/p/$pasteId")({
 });
 
 function PasteRoute() {
+	const { pasteId } = Route.useParams();
 	const paste = Route.useLoaderData();
 
-	return <PasteIdPage paste={paste} />;
+	return <PasteIdPage key={pasteId} paste={paste} pasteId={pasteId} />;
 }
