@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getPasteLanguageView } from "@/features/paste-preview/paste-language-view";
 import { detectPasteLanguage, normalizeLanguage, PasteLanguages } from "@/libs/language";
 
 const positiveCases = [
@@ -211,4 +212,20 @@ describe("language utilities", () => {
 			expect(normalizeLanguage(alias)).toBe(language);
 		});
 	}
+});
+
+describe("paste language view", () => {
+	it("labels auto-detected content", () => {
+		expect(getPasteLanguageView("const x = 1;", "auto")).toEqual({
+			previewLanguage: "javascript",
+			languageLabel: "Auto: JavaScript",
+		});
+	});
+
+	it("labels an explicit language", () => {
+		expect(getPasteLanguageView("# Hello", "markdown")).toEqual({
+			previewLanguage: "markdown",
+			languageLabel: "Markdown",
+		});
+	});
 });

@@ -81,17 +81,47 @@ export const parsePasteDraft = Schema.decodeUnknownSync(PasteDraftSchema);
 
 export const MaxPasteContentLength = 200_000;
 
+const PasteContentSchema = Schema.String.check(
+	Schema.isMinLength(1, { message: "Paste content is required." }),
+	Schema.isMaxLength(MaxPasteContentLength, {
+		message: `Paste is too long. The limit is ${MaxPasteContentLength.toLocaleString()} characters.`,
+	}),
+	Schema.isPattern(/\S/, { message: "Paste content is required." }),
+);
+
+const PasteTitleSchema = Schema.String.check(
+	Schema.isMaxLength(120, { message: "The title must be 120 characters or fewer." }),
+);
+
+const PastePasswordSchema = Schema.String.check(
+	Schema.isMinLength(8, { message: "The password must be at least 8 characters." }),
+	Schema.isMaxLength(128, { message: "The password must be 128 characters or fewer." }),
+);
+
+const PasteFormPasswordSchema = Schema.String.check(
+	Schema.isMaxLength(128, { message: "The password must be 128 characters or fewer." }),
+	Schema.isPattern(/^$|^.{8,}$/, { message: "The password must be at least 8 characters." }),
+);
+
+const PasteFormSchema = Schema.Struct({
+	content: PasteContentSchema,
+	language: PasteLanguageSchema,
+	title: PasteTitleSchema,
+	expiresIn: PasteExpirySchema,
+	password: PasteFormPasswordSchema,
+});
+
+export type PasteFormValues = Schema.Schema.Type<typeof PasteFormSchema>;
+
+export const PasteFormStandardSchema = Schema.toStandardSchemaV1(PasteFormSchema);
+
 const CreatePasteInputSchema = Schema.Struct({
-	content: Schema.String.check(
-		Schema.isMinLength(1),
-		Schema.isMaxLength(MaxPasteContentLength),
-		Schema.isPattern(/\S/),
-	),
+	content: PasteContentSchema,
 	language: PasteLanguageSchema,
 	detectedLanguage: Schema.optional(PasteLanguageSchema),
-	title: Schema.optional(Schema.String.check(Schema.isMaxLength(120))),
+	title: Schema.optional(PasteTitleSchema),
 	expiresIn: Schema.optional(PasteExpirySchema),
-	password: Schema.optional(Schema.String.check(Schema.isMinLength(8), Schema.isMaxLength(128))),
+	password: Schema.optional(PastePasswordSchema),
 });
 
 export type CreatePasteInput = Schema.Schema.Type<typeof CreatePasteInputSchema>;

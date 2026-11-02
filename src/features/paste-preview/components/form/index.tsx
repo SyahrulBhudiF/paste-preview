@@ -1,282 +1,59 @@
-import { Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { LockKeyhole } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-	Combobox,
-	ComboboxContent,
-	ComboboxEmpty,
-	ComboboxInput,
-	ComboboxItem,
-	ComboboxList,
-} from "@/components/ui/combobox";
-import { CodeEditor } from "@/features/paste-preview/components/code-editor";
-import { CodeOptions } from "@/features/paste-preview/components/code-options";
-import { PasswordDialog } from "@/features/paste-preview/components/form/password-dialog";
-import { PastePreview } from "@/features/paste-preview/components/preview";
+import { PasteFormHeader } from "@/features/paste-preview/components/form/header";
+import { PasteOptionsBar } from "@/features/paste-preview/components/form/options";
+import { PasteEditorPanes } from "@/features/paste-preview/components/form/panes";
+import { ShareLinkBanner } from "@/features/paste-preview/components/form/share-link";
+import { PasteStatusFooter } from "@/features/paste-preview/components/form/status";
 import { usePasteForm } from "@/features/paste-preview/hooks/use-paste-form";
-import { PasteExpiryOptions } from "@/libs/schemas/paste";
-import { PasteLanguages } from "@/libs/language";
-import { cn } from "@/libs/utils/cn";
 
 export function PasteForm() {
 	const {
-		activePane,
 		content,
 		copyShareUrl,
-		createPasteMutation,
-		error,
-		expiryLabel,
+		expiresIn,
 		form,
 		hasContent,
+		isSaving,
 		languageLabel,
 		password,
 		previewLanguage,
 		selectedLanguage,
 		setPassword,
-		setActivePane,
 		setContent,
 		sharePasswordProtected,
 		shareUrl,
 	} = usePasteForm();
-	const [showLineNumbers, setShowLineNumbers] = useState(true);
-	const [wrap, setWrap] = useState(false);
-	const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-	const lineCount = content.split("\n").length;
-
-	const copySource = async () => {
-		try {
-			await navigator.clipboard.writeText(content);
-			toast.success("Source copied");
-		} catch {
-			toast.error("Could not copy source");
-		}
-	};
 
 	return (
 		<form
 			className="flex h-full min-h-0 min-w-0 flex-col px-2 pb-2 sm:px-3 sm:pb-3"
 			action={() => void form.handleSubmit()}
 		>
-			<header className="app-header">
-				<h1 className="app-wordmark">
-					paste<span>/</span>preview
-				</h1>
-				<form.Field name="language">
-					{(field) => (
-						<Combobox
-							items={PasteLanguages}
-							value={
-								PasteLanguages.find((item) => item.value === selectedLanguage) ??
-								null
-							}
-							itemToStringLabel={(item) =>
-								item.value === "auto" && selectedLanguage === "auto"
-									? languageLabel
-									: item.label
-							}
-							itemToStringValue={(item) => item.label}
-							onValueChange={(item) => {
-								if (!item) return;
-								const next = item.value;
-								field.handleChange(next);
-							}}
-						>
-							<ComboboxInput
-								aria-label="Language"
-								placeholder={languageLabel}
-								className="w-26 min-[380px]:w-32 sm:w-44"
-							/>
-							<ComboboxContent>
-								<ComboboxEmpty>No languages found.</ComboboxEmpty>
-								<ComboboxList>
-									{(item) => (
-										<ComboboxItem key={item.value} value={item}>
-											{item.label}
-										</ComboboxItem>
-									)}
-								</ComboboxList>
-							</ComboboxContent>
-						</Combobox>
-					)}
-				</form.Field>
-				<Button
-					type="submit"
-					size="sm"
-					disabled={createPasteMutation.isPending || !hasContent}
-					className="ml-auto shrink-0 sm:ml-0"
-				>
-					{createPasteMutation.isPending ? "Saving..." : "Save & share"}
-				</Button>
-			</header>
-			<div className="flex min-w-0 flex-wrap items-center gap-2 border-x border-border bg-card px-2 py-2 sm:px-3">
-				<form.Field name="title">
-					{(field) => (
-						<input
-							aria-label="Paste title (optional)"
-							className="h-8 min-w-28 flex-1 border border-input bg-background px-2 text-xs outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
-							maxLength={120}
-							placeholder="Title (optional)"
-							value={field.state.value}
-							onChange={(event) => field.handleChange(event.target.value)}
-						/>
-					)}
-				</form.Field>
-				<form.Field name="expiresIn">
-					{(field) => (
-						<select
-							aria-label="Paste expiry"
-							className="h-8 w-28 border border-input bg-background px-2 text-xs outline-none focus:border-ring focus:ring-1 focus:ring-ring"
-							value={field.state.value}
-							onChange={(event) => {
-								const selected = PasteExpiryOptions.find(
-									(option) => option.value === event.target.value,
-								);
-								if (selected) field.handleChange(selected.value);
-							}}
-						>
-							{PasteExpiryOptions.map((option) => (
-								<option key={option.value} value={option.value}>
-									{option.label}
-								</option>
-							))}
-						</select>
-					)}
-				</form.Field>
-				<Button
-					type="button"
-					size="sm"
-					variant={password ? "secondary" : "outline"}
-					onClick={() => setPasswordDialogOpen(true)}
-				>
-					<LockKeyhole className="size-3.5" aria-hidden="true" />
-					{password ? "Password on" : "Add password"}
-				</Button>
-			</div>
-
+			<PasteFormHeader
+				form={form}
+				languageLabel={languageLabel}
+				selectedLanguage={selectedLanguage}
+				isSaving={isSaving}
+				hasContent={hasContent}
+			/>
+			<PasteOptionsBar form={form} password={password} onPasswordChange={setPassword} />
 			{shareUrl ? (
-				<output className="mb-2 flex min-w-0 items-center gap-3 border border-border bg-secondary px-3 py-1.5 text-xs">
-					<span className="shrink-0 text-muted-foreground">
-						{sharePasswordProtected ? "Password protected" : "Public link"}
-					</span>
-					<Link
-						className="min-w-0 flex-1 truncate text-primary underline underline-offset-4"
-						to={shareUrl}
-					>
-						{shareUrl}
-					</Link>
-					<Button type="button" size="sm" variant="ghost" onClick={copyShareUrl}>
-						Copy link
-					</Button>
-					{sharePasswordProtected ? (
-						<span className="basis-full text-muted-foreground">
-							Share the password separately.
-						</span>
-					) : null}
-				</output>
+				<ShareLinkBanner
+					shareUrl={shareUrl}
+					passwordProtected={sharePasswordProtected}
+					onCopy={copyShareUrl}
+				/>
 			) : null}
-			{error ? (
-				<p
-					role="alert"
-					className="mb-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-				>
-					{error}
-				</p>
-			) : null}
-
-			<fieldset
-				className="flex min-w-0 shrink-0 border border-b-0 border-border bg-secondary/50 md:hidden"
-				aria-label="Visible pane"
-			>
-				<button
-					className="pane-tab"
-					type="button"
-					aria-pressed={activePane === "editor"}
-					onClick={() => setActivePane("editor")}
-				>
-					Source
-				</button>
-				<button
-					className="pane-tab"
-					type="button"
-					aria-pressed={activePane === "preview"}
-					onClick={() => setActivePane("preview")}
-				>
-					Preview
-				</button>
-			</fieldset>
-			<div className="grid min-h-0 min-w-0 flex-1 border border-border bg-card md:grid-cols-2">
-				<section
-					aria-label="Source editor"
-					className={cn(
-						"min-h-0 min-w-0 flex-col md:flex",
-						activePane === "editor" ? "flex" : "hidden",
-					)}
-				>
-					<div className="pane-toolbar">
-						<label className="pane-label" htmlFor="paste-content">
-							Source
-						</label>
-						<CodeOptions
-							showLineNumbers={showLineNumbers}
-							onLineNumbersChange={setShowLineNumbers}
-							wrap={wrap}
-							onWrapChange={setWrap}
-						/>
-					</div>
-					<form.Field name="content">
-						{(field) => (
-							<CodeEditor
-								content={field.state.value}
-								onChange={setContent}
-								showLineNumbers={showLineNumbers}
-								wrap={wrap}
-							/>
-						)}
-					</form.Field>
-				</section>
-				<section
-					aria-label="Live preview"
-					className={cn(
-						"min-h-0 min-w-0 flex-col md:flex md:border-l md:border-border",
-						activePane === "preview" ? "flex" : "hidden",
-					)}
-				>
-					<div className="pane-toolbar">
-						<h2 className="pane-label">Preview</h2>
-						<button
-							className="code-action"
-							type="button"
-							onClick={copySource}
-							disabled={!hasContent}
-						>
-							Copy
-						</button>
-					</div>
-					<div className="min-h-0 min-w-0 flex-1 overflow-hidden">
-						<PastePreview
-							content={content}
-							language={previewLanguage}
-							showLineNumbers={showLineNumbers}
-							wrap={wrap}
-						/>
-					</div>
-				</section>
-			</div>
-			<footer className="workspace-status">
-				<span>
-					{lineCount.toLocaleString()} lines · {content.length.toLocaleString()}{" "}
-					characters · UTF-8
-				</span>
-				<span className="hidden sm:inline">{languageLabel}</span>
-				<span className="sm:hidden">Expires in {expiryLabel}</span>
-			</footer>
-			<PasswordDialog
-				open={passwordDialogOpen}
-				isProtected={Boolean(password)}
-				onOpenChange={setPasswordDialogOpen}
-				onPasswordChange={setPassword}
+			<PasteEditorPanes
+				form={form}
+				content={content}
+				previewLanguage={previewLanguage}
+				hasContent={hasContent}
+				onContentChange={setContent}
+			/>
+			<PasteStatusFooter
+				content={content}
+				languageLabel={languageLabel}
+				expiresIn={expiresIn}
 			/>
 		</form>
 	);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+	PasteFormStandardSchema,
 	parseCreatePasteInput,
 	parseGetPasteInput,
 	parsePasteDraft,
@@ -24,6 +25,46 @@ describe("paste schemas", () => {
 		expect(() => parseCreatePasteInput({ content: "   ", language: "text" })).toThrow(
 			/content/i,
 		);
+	});
+
+	it("validates the form through a Standard Schema", () => {
+		const result = PasteFormStandardSchema["~standard"].validate({
+			content: "   ",
+			language: "text",
+			title: "",
+			expiresIn: "7d",
+			password: "",
+		});
+
+		expect(result instanceof Promise).toBe(false);
+		if (result instanceof Promise) throw new Error("expected sync validation");
+		expect(result.issues?.[0]?.message).toBe("Paste content is required.");
+	});
+
+	it("allows an empty form password", () => {
+		const result = PasteFormStandardSchema["~standard"].validate({
+			content: "hello",
+			language: "text",
+			title: "",
+			expiresIn: "7d",
+			password: "",
+		});
+
+		if (result instanceof Promise) throw new Error("expected sync validation");
+		expect(result.issues).toBeUndefined();
+	});
+
+	it("rejects a short form password", () => {
+		const result = PasteFormStandardSchema["~standard"].validate({
+			content: "hello",
+			language: "text",
+			title: "",
+			expiresIn: "7d",
+			password: "short",
+		});
+
+		if (result instanceof Promise) throw new Error("expected sync validation");
+		expect(result.issues?.[0]?.message).toBe("The password must be at least 8 characters.");
 	});
 
 	it("rejects an unknown detected language", () => {
