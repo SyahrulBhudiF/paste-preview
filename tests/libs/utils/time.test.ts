@@ -13,4 +13,10 @@ describe("formatExpiry", () => {
 			formatExpiry("2026-07-06T00:30:00.000Z", new Date("2026-07-06T00:00:00.000Z")),
 		).toContain("Expires soon");
 	});
+
+	it("formats the exact date in UTC", () => {
+		expect(
+			formatExpiry("2026-11-08T20:00:00.000Z", new Date("2026-11-08T00:00:00.000Z")),
+		).toContain("Nov 8, 2026");
+	});
 });

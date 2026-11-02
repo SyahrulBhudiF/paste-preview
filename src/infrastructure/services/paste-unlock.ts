@@ -17,8 +17,6 @@ export const unlockStoredPaste: (
 		const verifier = paste?.passwordVerifier;
 		if (!paste || !verifier) return { status: "invalid" };
 
-		if (!(yield* rateLimit)) return { status: "rate-limited" };
-
 		const passwordMatches = yield* Effect.tryPromise({
 			try: () => verifyPassword(input.password, verifier),
 			catch: () =>
@@ -27,6 +25,9 @@ export const unlockStoredPaste: (
 					operation: "unlock",
 				}),
 		});
-		return passwordMatches ? { status: "unlocked", paste } : { status: "invalid" };
+		if (passwordMatches) return { status: "unlocked", paste };
+
+		if (!(yield* rateLimit)) return { status: "rate-limited" };
+		return { status: "invalid" };
 	},
 );

@@ -11,6 +11,7 @@ import {
 } from "@/libs/language";
 import {
 	DefaultPasteExpiry,
+	MaxPasteContentLength,
 	parsePasteDraft,
 	PasteExpiryOptions,
 	type CreatePasteInput,
@@ -26,6 +27,11 @@ export interface PasteFormValues {
 	expiresIn: PasteExpiry;
 }
 
+interface SavedPaste extends PasteFormValues {
+	url: string;
+	passwordProtected: boolean;
+}
+
 const defaultValues: PasteFormValues = {
 	content: "",
 	language: "auto",
@@ -36,9 +42,8 @@ const defaultValues: PasteFormValues = {
 export function usePasteForm() {
 	const queryClient = useQueryClient();
 	const [activePane, setActivePane] = useState<"editor" | "preview">("editor");
-	const [shareUrl, setShareUrl] = useState<string | null>(null);
 	const [password, setPassword] = useState("");
-	const [sharePasswordProtected, setSharePasswordProtected] = useState(false);
+	const [savedPaste, setSavedPaste] = useState<SavedPaste | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	const createPasteMutation = useMutation({
@@ -60,8 +65,14 @@ export function usePasteForm() {
 		},
 		onSuccess: (result, value) => {
 			void queryClient.invalidateQueries({ queryKey: ["paste"] });
-			setShareUrl(result.url);
-			setSharePasswordProtected(Boolean(value.password));
+			setSavedPaste({
+				url: result.url,
+				passwordProtected: Boolean(value.password),
+				content: value.content,
+				language: value.language,
+				title: value.title,
+				expiresIn: value.expiresIn,
+			});
 			setPassword("");
 			localStorage.removeItem(DraftStorageKey);
 			toast.success("Paste saved");
@@ -74,15 +85,27 @@ export function usePasteForm() {
 	const form = useForm({
 		defaultValues,
 		onSubmit: async ({ value }) => {
+			if (createPasteMutation.isPending) return;
+
 			setError(null);
-			setShareUrl(null);
 
 			if (!value.content.trim()) {
 				setError("Paste content is required.");
 				return;
 			}
 
-			await createPasteMutation.mutateAsync({ ...value, password });
+			if (value.content.length > MaxPasteContentLength) {
+				setError(
+					`Paste is too long. The limit is ${MaxPasteContentLength.toLocaleString()} characters.`,
+				);
+				return;
+			}
+
+			try {
+				await createPasteMutation.mutateAsync({ ...value, password });
+			} catch {
+				// onError already surfaced the failure and kept the editor content.
+			}
 		},
 	});
 	const content = useStore(form.store, (state) => state.values.content);
@@ -102,6 +125,16 @@ export function usePasteForm() {
 			: (PasteLanguages.find((item) => item.value === previewLanguage)?.label ??
 				previewLanguage);
 	const hasContent = content.trim().length > 0;
+	const currentSavedPaste =
+		savedPaste &&
+		savedPaste.content === content &&
+		savedPaste.language === selectedLanguage &&
+		savedPaste.title.trim() === title.trim() &&
+		savedPaste.expiresIn === expiresIn
+			? savedPaste
+			: null;
+	const shareUrl = currentSavedPaste?.url ?? null;
+	const sharePasswordProtected = currentSavedPaste?.passwordProtected ?? false;
 
 	useEffect(() => {
 		const raw = localStorage.getItem(DraftStorageKey);

@@ -26,7 +26,8 @@ export function UnlockPasteDialog({
 	const [isUnlocking, setIsUnlocking] = useState(false);
 
 	const handleOpenChange = (nextOpen: boolean) => {
-		if (nextOpen) setError(null);
+		if (!nextOpen) setPassword("");
+		setError(null);
 		onOpenChange(nextOpen);
 	};
 
@@ -51,8 +52,7 @@ export function UnlockPasteDialog({
 			}
 
 			onUnlocked(result.paste);
-			setPassword("");
-			onOpenChange(false);
+			handleOpenChange(false);
 			toast.success("Paste unlocked");
 		} catch {
 			setError("Could not unlock this paste. Please try again.");
@@ -97,7 +97,11 @@ export function UnlockPasteDialog({
 						</p>
 					) : null}
 					<div className="flex justify-end gap-2 pt-2">
-						<Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+						<Button
+							type="button"
+							variant="ghost"
+							onClick={() => handleOpenChange(false)}
+						>
 							Cancel
 						</Button>
 						<Button type="submit" disabled={isUnlocking || !password}>

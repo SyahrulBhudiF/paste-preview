@@ -20,6 +20,22 @@ describe("paste schemas", () => {
 		expect(() => parseCreatePasteInput({ content: "", language: "text" })).toThrow(/content/i);
 	});
 
+	it("rejects whitespace-only content", () => {
+		expect(() => parseCreatePasteInput({ content: "   ", language: "text" })).toThrow(
+			/content/i,
+		);
+	});
+
+	it("rejects an unknown detected language", () => {
+		expect(() =>
+			parseCreatePasteInput({
+				content: "hello",
+				language: "auto",
+				detectedLanguage: "not-a-language",
+			}),
+		).toThrow(/detectedLanguage/i);
+	});
+
 	it("parses optional title, expiry, and password", () => {
 		expect(
 			parseCreatePasteInput({

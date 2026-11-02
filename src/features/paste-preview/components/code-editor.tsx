@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { MaxPasteContentLength } from "@/libs/schemas/paste";
 
 export function CodeEditor({
 	content,
@@ -37,6 +38,7 @@ export function CodeEditor({
 				id="paste-content"
 				aria-label="Paste content"
 				value={content}
+				maxLength={MaxPasteContentLength}
 				onChange={(event) => onChange(event.target.value)}
 				onScroll={(event) => {
 					if (mirrorRef.current)

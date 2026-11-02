@@ -2,6 +2,7 @@ const ExpiryDateFormatter = new Intl.DateTimeFormat("en", {
 	month: "short",
 	day: "numeric",
 	year: "numeric",
+	timeZone: "UTC",
 });
 
 export const formatExpiry = (expiresAt: string, now = new Date()) => {

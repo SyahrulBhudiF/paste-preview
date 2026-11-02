@@ -1,7 +1,6 @@
 import { env } from "cloudflare:workers";
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
-import { PasteNotFoundError } from "@/infrastructure/errors/paste";
 import { runEffect } from "@/infrastructure/runtime";
 import { PasteStorageService } from "@/infrastructure/services";
 import type { PublicPaste, PasteReadResult, StoredPaste } from "@/infrastructure/schemas/paste";
@@ -28,6 +27,10 @@ const rateLimitMiddleware = (scope: string) =>
 		return next();
 	});
 
+const requestContextMiddleware = createMiddleware({ type: "request" }).server(
+	async ({ request, next }) => next({ context: { origin: new URL(request.url).origin } }),
+);
+
 const toPublicPaste = (paste: StoredPaste): PublicPaste => {
 	return Object.assign(
 		{
@@ -48,13 +51,13 @@ const toPasteReadResult = (paste: StoredPaste): PasteReadResult =>
 		: { status: "open", paste: toPublicPaste(paste) };
 
 export const createPaste = createServerFn({ method: "POST" })
-	.middleware([rateLimitMiddleware("create")])
+	.middleware([requestContextMiddleware, rateLimitMiddleware("create")])
 	.validator(parseCreatePasteInput)
-	.handler(async ({ data }) =>
+	.handler(async ({ data, context }) =>
 		runEffect(
 			Effect.gen(function* () {
 				const storage = yield* PasteStorageService;
-				return yield* storage.create(data);
+				return yield* storage.create(data, context.origin);
 			}),
 		),
 	);
@@ -65,21 +68,11 @@ export const getPaste = createServerFn({ method: "GET" })
 		runEffect(
 			Effect.gen(function* () {
 				const storage = yield* PasteStorageService;
-				return yield* storage
-					.getById(data.id)
-					.pipe(Effect.map(toPasteReadResult))
-					.pipe(Effect.catchTag("PasteNotFoundError", () => Effect.succeed(null)));
-			}).pipe(
-				Effect.catchTag("PasteStorageError", () =>
-					Effect.fail(
-						new PasteNotFoundError({
-							message: "Paste not found or expired.",
-							pasteId: data.id,
-						}),
-					),
-				),
-				Effect.catchTag("PasteNotFoundError", () => Effect.succeed(null)),
-			),
+				return yield* storage.getById(data.id).pipe(
+					Effect.map(toPasteReadResult),
+					Effect.catchTag("PasteNotFoundError", () => Effect.succeed(null)),
+				);
+			}),
 		),
 	);
 

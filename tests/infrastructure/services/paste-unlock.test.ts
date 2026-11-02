@@ -8,6 +8,7 @@ import { parseUnlockPasteInput } from "@/libs/schemas/paste";
 
 const credentialField = ["pass", "word"].join("");
 const validPhrase = ["cobalt", "forest", "ember"].join("-");
+const wrongPhrase = ["violet", "river", "lantern"].join("-");
 
 const makePaste = async (phrase: string): Promise<StoredPaste> => ({
 	id: "test-paste",
@@ -47,7 +48,6 @@ describe("paste unlock policy", () => {
 
 	it("returns invalid for a wrong phrase and a paste without a verifier", async () => {
 		const paste = await makePaste(validPhrase);
-		const wrongPhrase = ["violet", "river", "lantern"].join("-");
 		const wrongPhraseResult = await Effect.runPromise(
 			unlockStoredPaste({
 				paste,
@@ -72,7 +72,20 @@ describe("paste unlock policy", () => {
 		expect(openPasteResult).toEqual({ status: "invalid" });
 	});
 
-	it("returns a rate-limited result before checking the phrase", async () => {
+	it("returns a rate-limited result after a wrong phrase", async () => {
+		const paste = await makePaste(validPhrase);
+		const result = await Effect.runPromise(
+			unlockStoredPaste({
+				paste,
+				input: makeInput(wrongPhrase),
+				rateLimit: Effect.succeed(false),
+			}),
+		);
+
+		expect(result).toEqual({ status: "rate-limited" });
+	});
+
+	it("unlocks with the correct phrase even when the failure budget is spent", async () => {
 		const paste = await makePaste(validPhrase);
 		const result = await Effect.runPromise(
 			unlockStoredPaste({
@@ -82,14 +95,17 @@ describe("paste unlock policy", () => {
 			}),
 		);
 
-		expect(result).toEqual({ status: "rate-limited" });
+		expect(result).toMatchObject({
+			status: "unlocked",
+			paste: { content: "private content" },
+		});
 	});
 
-	it("propagates rate-limit infrastructure failures", async () => {
+	it("propagates rate-limit infrastructure failures after a wrong phrase", async () => {
 		const paste = await makePaste(validPhrase);
 		const result = unlockStoredPaste({
 			paste,
-			input: makeInput(validPhrase),
+			input: makeInput(wrongPhrase),
 			rateLimit: Effect.fail(
 				new PasteStorageError({ message: "Could not check limit.", operation: "unlock" }),
 			),

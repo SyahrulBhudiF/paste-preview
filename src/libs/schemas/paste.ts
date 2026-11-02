@@ -79,10 +79,16 @@ const PasteDraftSchema = Schema.Struct({
 
 export const parsePasteDraft = Schema.decodeUnknownSync(PasteDraftSchema);
 
+export const MaxPasteContentLength = 200_000;
+
 const CreatePasteInputSchema = Schema.Struct({
-	content: Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(200_000)),
+	content: Schema.String.check(
+		Schema.isMinLength(1),
+		Schema.isMaxLength(MaxPasteContentLength),
+		Schema.isPattern(/\S/),
+	),
 	language: PasteLanguageSchema,
-	detectedLanguage: Schema.optional(Schema.String),
+	detectedLanguage: Schema.optional(PasteLanguageSchema),
 	title: Schema.optional(Schema.String.check(Schema.isMaxLength(120))),
 	expiresIn: Schema.optional(PasteExpirySchema),
 	password: Schema.optional(Schema.String.check(Schema.isMinLength(8), Schema.isMaxLength(128))),

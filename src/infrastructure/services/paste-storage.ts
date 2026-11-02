@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { Context, Effect, Layer, Schema } from "effect";
 import { nanoid } from "nanoid";
-import { PasteExpirySeconds, ProductionOrigin } from "@/infrastructure/config/paste";
+import { PasteExpirySeconds } from "@/infrastructure/config/paste";
 import { createPasswordVerifier } from "@/infrastructure/crypto/password";
 import { PasteNotFoundError, PasteStorageError } from "@/infrastructure/errors/paste";
 import { unlockStoredPaste } from "@/infrastructure/services/paste-unlock";
@@ -18,7 +18,10 @@ import {
 } from "@/infrastructure/schemas/paste";
 
 export interface PasteStorageServiceContract {
-	create: (input: CreatePasteInput) => Effect.Effect<CreatedPaste, PasteStorageError>;
+	create: (
+		input: CreatePasteInput,
+		origin: string,
+	) => Effect.Effect<CreatedPaste, PasteStorageError>;
 	getById: (id: string) => Effect.Effect<StoredPaste, PasteNotFoundError | PasteStorageError>;
 	unlock: (input: UnlockPasteInput) => Effect.Effect<PasteUnlockResult, PasteStorageError>;
 }
@@ -26,9 +29,7 @@ export interface PasteStorageServiceContract {
 const pasteKey = (id: string) => `paste:${id}`;
 const DevPasteStore = new Map<string, string>();
 
-const getOrigin = () => ("location" in globalThis ? globalThis.location.origin : ProductionOrigin);
-
-const create: PasteStorageServiceContract["create"] = (input) =>
+const create: PasteStorageServiceContract["create"] = (input, origin) =>
 	Effect.tryPromise({
 		try: async () => {
 			const id = nanoid(10);
@@ -64,7 +65,7 @@ const create: PasteStorageServiceContract["create"] = (input) =>
 
 			return {
 				id,
-				url: `${getOrigin()}/p/${id}`,
+				url: `${origin}/p/${id}`,
 				expiresAt: paste.expiresAt,
 			};
 		},

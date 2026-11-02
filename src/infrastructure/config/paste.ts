@@ -6,5 +6,3 @@ export const PasteExpirySeconds = {
 	"7d": 60 * 60 * 24 * 7,
 	"30d": 60 * 60 * 24 * 30,
 } satisfies Record<PasteExpiry, number>;
-
-export const ProductionOrigin = "https://preview.ryuko.my.id";
