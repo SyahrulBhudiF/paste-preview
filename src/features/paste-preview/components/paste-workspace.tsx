@@ -5,7 +5,8 @@ import { CodeOptions } from "@/features/paste-preview/components/code-options";
 import { CodePreview } from "@/features/paste-preview/components/code";
 import { PastePreview } from "@/features/paste-preview/components/preview";
 import type { PublicPaste } from "@/infrastructure/schemas/paste";
-import { isHtmlLanguage, isMarkdownLanguage } from "@/libs/language";
+import { downloadText, getDownloadName } from "@/libs/download";
+import { isHtmlLanguage, isMarkdownLanguage, normalizeLanguage } from "@/libs/language";
 import { formatExpiry } from "@/libs/utils/time";
 
 export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
@@ -23,6 +24,10 @@ export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 		} catch {
 			toast.error("Could not copy source");
 		}
+	};
+
+	const downloadSource = () => {
+		downloadText(paste.content, getDownloadName(normalizeLanguage(language)));
 	};
 
 	return (
@@ -54,6 +59,9 @@ export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 					) : null}
 					<button className="code-action" type="button" onClick={copySource}>
 						Copy source
+					</button>
+					<button className="code-action" type="button" onClick={downloadSource}>
+						Download
 					</button>
 				</div>
 				<div className="min-h-0 min-w-0 flex-1 overflow-hidden">
