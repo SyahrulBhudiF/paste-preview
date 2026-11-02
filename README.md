@@ -1,26 +1,49 @@
 # Paste Preview
 
-Share code and markdown snippets via public links. Built with TanStack Start, deployed on Cloudflare Workers.
-<img width="1794" height="1020" alt="image" src="https://github.com/user-attachments/assets/4860e0ba-c1d9-4654-8f39-dbc1bd67d713" />
+Share code, Markdown, and HTML through public links. Each paste can have a title, an expiry, and an optional password. Built with TanStack Start and deployed on Cloudflare Workers.
+
+![Paste Preview editor with a share link](docs/editor.png)
+
+## Features
+
+- Paste code, Markdown, HTML, or plain text.
+- Detect the language automatically, or choose one from the list.
+- Set a title, an expiry from one hour to thirty days, and an optional password.
+- Preview Markdown inline and HTML in a sandboxed iframe.
+- Download the shared source with the matching file extension.
+- Password protection gates access to the paste. It does not encrypt the stored content.
+
+![Shared paste page with the download action](docs/shared-paste.png)
 
 ## Stack
 
-- TanStack Start + React 19
+- TanStack Start and React 19
 - Effect-TS
-- Tailwind v4
-- Cloudflare Workers + KV
+- Tailwind CSS v4
+- Cloudflare Workers and KV
 
 ## Development
 
 ```sh
-vp install   # install deps
-vp dev       # start dev server
+vp install   # install dependencies
+vp dev       # start the dev server
+```
+
+## Checks
+
+```sh
+vp run check          # format and lint
+vp run test:run       # tests
+vp exec tsc --noEmit  # typecheck
+vp build              # production build
+vp run doctor --verbose
 ```
 
 ## Deploy
 
 ```sh
+vp run alchemy:login   # once, to connect the Cloudflare account
 vp run deploy
 ```
 
-url: [preview.ryuko.my.id](https://preview.ryuko.my.id)
+Live at [preview.ryuko.my.id](https://preview.ryuko.my.id).
