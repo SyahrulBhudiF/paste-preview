@@ -5,6 +5,8 @@ import {
 	DefaultPasteExpiry,
 	parsePasteDraft,
 	PasteExpiryOptions,
+	serializePasteDraft,
+	type PasteDraft,
 	type PasteFormValues,
 } from "@/libs/schemas/paste";
 
@@ -44,10 +46,8 @@ export function usePasteDraft({ form, content, language, title, expiresIn }: Pas
 
 	useEffect(() => {
 		const handle = window.setTimeout(() => {
-			localStorage.setItem(
-				DraftStorageKey,
-				JSON.stringify({ content, language, title, expiresIn }),
-			);
+			const draft: PasteDraft = { content, language, title, expiresIn };
+			localStorage.setItem(DraftStorageKey, serializePasteDraft(draft));
 		}, 500);
 		return () => window.clearTimeout(handle);
 	}, [content, expiresIn, language, title]);

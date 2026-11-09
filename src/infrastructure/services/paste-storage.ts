@@ -1,9 +1,10 @@
 import { env } from "cloudflare:workers";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, DateTime, Effect, Layer, Schema } from "effect";
 import { nanoid } from "nanoid";
 import { PasteExpirySeconds } from "@/infrastructure/config/paste";
 import { createPasswordVerifier } from "@/infrastructure/crypto/password";
 import { PasteNotFoundError, PasteStorageError } from "@/infrastructure/errors/paste";
+import { createPasteRecord, isExpired, toCreatedPaste } from "@/infrastructure/paste/records";
 import { unlockStoredPaste } from "@/infrastructure/services/paste-unlock";
 import {
 	DefaultPasteExpiry,
@@ -32,42 +33,27 @@ const DevPasteStore = new Map<string, string>();
 const create: PasteStorageServiceContract["create"] = (input, origin) =>
 	Effect.tryPromise({
 		try: async () => {
-			const id = nanoid(10);
-			const createdAt = new Date();
+			const now = DateTime.nowUnsafe();
 			const expiresIn = input.expiresIn ?? DefaultPasteExpiry;
 			const expirationTtl = PasteExpirySeconds[expiresIn];
-			const expiresAt = new Date(createdAt.getTime() + expirationTtl * 1000);
-			const detectedLanguage = input.detectedLanguage ?? input.language;
-			const title = input.title?.trim();
 			const passwordVerifier = input.password
 				? await createPasswordVerifier(input.password)
 				: undefined;
-			const paste: StoredPaste = Object.assign(
-				{
-					id,
-					content: input.content,
-					language: input.language,
-					detectedLanguage,
-					createdAt: createdAt.toISOString(),
-					expiresAt: expiresAt.toISOString(),
-				},
-				title ? { title } : undefined,
-				passwordVerifier ? { passwordVerifier } : undefined,
-			);
+			const paste = createPasteRecord(input, {
+				id: nanoid(10),
+				now,
+				passwordVerifier,
+			});
 
 			if (env.PASTES) {
-				await env.PASTES.put(pasteKey(id), JSON.stringify(paste), {
+				await env.PASTES.put(pasteKey(paste.id), JSON.stringify(paste), {
 					expirationTtl,
 				});
 			} else {
-				DevPasteStore.set(pasteKey(id), JSON.stringify(paste));
+				DevPasteStore.set(pasteKey(paste.id), JSON.stringify(paste));
 			}
 
-			return {
-				id,
-				url: `${origin}/p/${id}`,
-				expiresAt: paste.expiresAt,
-			};
+			return toCreatedPaste(paste, origin);
 		},
 		catch: () =>
 			new PasteStorageError({
@@ -90,7 +76,7 @@ const getById: PasteStorageServiceContract["getById"] = (id) =>
 			}
 
 			const parsed = Schema.decodeUnknownSync(StoredPasteSchema)(JSON.parse(value));
-			if (Date.parse(parsed.expiresAt) <= Date.now()) {
+			if (isExpired(parsed, DateTime.nowUnsafe())) {
 				DevPasteStore.delete(pasteKey(id));
 				throw new PasteNotFoundError({
 					message: "Paste not found or expired.",

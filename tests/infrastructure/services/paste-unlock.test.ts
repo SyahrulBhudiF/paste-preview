@@ -44,6 +44,7 @@ describe("paste unlock policy", () => {
 		);
 
 		expect(result).toMatchObject({ status: "unlocked", paste: { content: "private content" } });
+		expect(result).not.toHaveProperty("paste.passwordVerifier");
 	});
 
 	it("returns invalid for a wrong phrase and a paste without a verifier", async () => {

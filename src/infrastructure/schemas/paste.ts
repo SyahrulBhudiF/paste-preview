@@ -7,7 +7,7 @@ export const PasswordVerifierSchema = Schema.Struct({
 });
 export type PasswordVerifier = Schema.Schema.Type<typeof PasswordVerifierSchema>;
 
-export const StoredPasteSchema = Schema.Struct({
+const PublicPasteFields = {
 	id: Schema.String,
 	content: Schema.String,
 	title: Schema.optional(Schema.String),
@@ -15,20 +15,16 @@ export const StoredPasteSchema = Schema.Struct({
 	detectedLanguage: Schema.String,
 	createdAt: Schema.String,
 	expiresAt: Schema.String,
+} as const;
+
+export const PublicPasteSchema = Schema.Struct(PublicPasteFields);
+export type PublicPaste = Schema.Schema.Type<typeof PublicPasteSchema>;
+
+export const StoredPasteSchema = Schema.Struct({
+	...PublicPasteFields,
 	passwordVerifier: Schema.optional(PasswordVerifierSchema),
 });
 export type StoredPaste = Schema.Schema.Type<typeof StoredPasteSchema>;
-
-export const PublicPasteSchema = Schema.Struct({
-	id: Schema.String,
-	content: Schema.String,
-	title: Schema.optional(Schema.String),
-	language: Schema.String,
-	detectedLanguage: Schema.String,
-	createdAt: Schema.String,
-	expiresAt: Schema.String,
-});
-export type PublicPaste = Schema.Schema.Type<typeof PublicPasteSchema>;
 
 export const PasteReadResultSchema = Schema.Union([
 	Schema.Struct({ status: Schema.Literal("open"), paste: PublicPasteSchema }),
@@ -37,7 +33,7 @@ export const PasteReadResultSchema = Schema.Union([
 export type PasteReadResult = Schema.Schema.Type<typeof PasteReadResultSchema>;
 
 export const PasteUnlockResultSchema = Schema.Union([
-	Schema.Struct({ status: Schema.Literal("unlocked"), paste: StoredPasteSchema }),
+	Schema.Struct({ status: Schema.Literal("unlocked"), paste: PublicPasteSchema }),
 	Schema.Struct({ status: Schema.Literal("invalid") }),
 	Schema.Struct({ status: Schema.Literal("rate-limited") }),
 ]);

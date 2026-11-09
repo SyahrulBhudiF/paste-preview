@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { verifyPassword } from "@/infrastructure/crypto/password";
 import { PasteStorageError } from "@/infrastructure/errors/paste";
+import { toPublicPaste } from "@/infrastructure/paste/views";
 import type { PasteUnlockResult, StoredPaste } from "@/infrastructure/schemas/paste";
 import type { UnlockPasteInput } from "@/libs/schemas/paste";
 
@@ -25,7 +26,7 @@ export const unlockStoredPaste: (
 					operation: "unlock",
 				}),
 		});
-		if (passwordMatches) return { status: "unlocked", paste };
+		if (passwordMatches) return { status: "unlocked", paste: toPublicPaste(paste) };
 
 		if (!(yield* rateLimit)) return { status: "rate-limited" };
 		return { status: "invalid" };

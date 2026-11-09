@@ -77,7 +77,10 @@ const PasteDraftSchema = Schema.Struct({
 	expiresIn: Schema.optional(PasteExpirySchema),
 });
 
+export type PasteDraft = Schema.Schema.Type<typeof PasteDraftSchema>;
+
 export const parsePasteDraft = Schema.decodeUnknownSync(PasteDraftSchema);
+export const serializePasteDraft = (draft: PasteDraft): string => JSON.stringify(draft);
 
 export const MaxPasteContentLength = 200_000;
 

@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { createPaste } from "@/apis/paste";
 import { useDebouncedValue } from "@/features/paste-preview/hooks/use-debounced-value";
 import { clearDraft, usePasteDraft } from "@/features/paste-preview/hooks/use-paste-draft";
+import { toCreatePasteInput, toSavedPaste } from "@/features/paste-preview/paste-commands";
 import { getPasteLanguageView } from "@/features/paste-preview/paste-language-view";
-import { getShareLink, type SavedPaste } from "@/features/paste-preview/share-link";
-import { detectPasteLanguage } from "@/libs/language";
+import { getShareLink } from "@/features/paste-preview/share-link";
 import {
 	DefaultPasteExpiry,
 	PasteFormStandardSchema,
@@ -22,28 +22,6 @@ const defaultValues: PasteFormValues = {
 	expiresIn: DefaultPasteExpiry,
 	password: "",
 };
-
-const toCreatePasteInput = (value: PasteFormValues): CreatePasteInput =>
-	Object.assign(
-		{
-			content: value.content,
-			language: value.language,
-			title: value.title,
-			expiresIn: value.expiresIn,
-			detectedLanguage:
-				value.language === "auto" ? detectPasteLanguage(value.content) : value.language,
-		},
-		value.password ? { password: value.password } : undefined,
-	);
-
-const toSavedPaste = (input: CreatePasteInput, url: string): SavedPaste => ({
-	url,
-	passwordProtected: Boolean(input.password),
-	content: input.content,
-	language: input.language,
-	title: input.title ?? "",
-	expiresIn: input.expiresIn ?? DefaultPasteExpiry,
-});
 
 export type PasteFormApi = ReturnType<typeof usePasteForm>["form"];
 

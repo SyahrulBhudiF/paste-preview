@@ -1,9 +1,9 @@
 import { env } from "cloudflare:workers";
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
+import { toPasteReadResult } from "@/infrastructure/paste/views";
 import { runEffect } from "@/infrastructure/runtime";
 import { PasteStorageService } from "@/infrastructure/services";
-import type { PublicPaste, PasteReadResult, StoredPaste } from "@/infrastructure/schemas/paste";
 import {
 	parseCreatePasteInput,
 	parseGetPasteInput,
@@ -30,25 +30,6 @@ const rateLimitMiddleware = (scope: string) =>
 const requestContextMiddleware = createMiddleware({ type: "request" }).server(
 	async ({ request, next }) => next({ context: { origin: new URL(request.url).origin } }),
 );
-
-const toPublicPaste = (paste: StoredPaste): PublicPaste => {
-	return Object.assign(
-		{
-			id: paste.id,
-			content: paste.content,
-			language: paste.language,
-			detectedLanguage: paste.detectedLanguage,
-			createdAt: paste.createdAt,
-			expiresAt: paste.expiresAt,
-		},
-		paste.title ? { title: paste.title } : undefined,
-	);
-};
-
-const toPasteReadResult = (paste: StoredPaste): PasteReadResult =>
-	paste.passwordVerifier
-		? { status: "locked", expiresAt: paste.expiresAt }
-		: { status: "open", paste: toPublicPaste(paste) };
 
 export const createPaste = createServerFn({ method: "POST" })
 	.middleware([requestContextMiddleware, rateLimitMiddleware("create")])
@@ -83,10 +64,7 @@ export const unlockPaste = createServerFn({ method: "POST" })
 		runEffect(
 			Effect.gen(function* () {
 				const storage = yield* PasteStorageService;
-				const result = yield* storage.unlock(data);
-				return result.status === "unlocked"
-					? { ...result, paste: toPublicPaste(result.paste) }
-					: result;
+				return yield* storage.unlock(data);
 			}),
 		),
 	);

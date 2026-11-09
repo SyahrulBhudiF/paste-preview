@@ -5,6 +5,7 @@ import {
 	parseGetPasteInput,
 	parsePasteDraft,
 	parseUnlockPasteInput,
+	serializePasteDraft,
 } from "@/libs/schemas/paste";
 
 const validPassword = ["Alpha", "Bravo", "Charlie", "1234"].join("-");
@@ -121,6 +122,17 @@ describe("paste schemas", () => {
 			}),
 		).toEqual({ content: "saved", language: "text", title: "Example", expiresIn: "30d" });
 		expect(() => parsePasteDraft({ title: 42 })).toThrow(/title/i);
+	});
+
+	it("round-trips a serialized draft", () => {
+		const draft = {
+			content: "saved",
+			language: "text",
+			title: "Example",
+			expiresIn: "30d",
+		} as const;
+
+		expect(parsePasteDraft(JSON.parse(serializePasteDraft(draft)))).toEqual(draft);
 	});
 
 	it("parses paste id", () => {
