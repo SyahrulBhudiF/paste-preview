@@ -40,6 +40,9 @@ jobs:
             - name: Test
               run: pnpm run test:run
 
+            - name: Rule tests
+              run: pnpm run test:rules
+
             - name: Verify Cloudflare token
               run: |
                   test -n "$CLOUDFLARE_API_TOKEN"

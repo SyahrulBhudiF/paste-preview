@@ -13,6 +13,7 @@ features, web features, or verifying changes.
 - `vp build` — production build
 - `vp run check` — format check + lint
 - `vp run test:run` — run tests once (vitest)
+- `vp run test:rules` — anti-slop rule tests (needs ~6 GiB virtual memory; CI only)
 - Lint falls back to built-in rules with a warning if oxlint's JS plugin host crashes (SIGABRT); the anti-slop rules are skipped in that case.
 - `vp run doctor --verbose` — React Doctor full scan
 - `vp run doctor --verbose --scope changed` — React Doctor changed-files scan

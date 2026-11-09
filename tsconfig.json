@@ -25,6 +25,7 @@
 		"tests",
 		"vite.config.ts",
 		"vitest.config.ts",
+		"vitest.rules.config.ts",
 		"alchemy/alchemy.run.ts",
 		"worker-configuration.d.ts"
 	],

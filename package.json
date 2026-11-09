@@ -17,6 +17,7 @@
 		"check": "vp run format:check && vp run lint",
 		"test": "vitest --config vitest.config.ts",
 		"test:run": "vitest run --config vitest.config.ts",
+		"test:rules": "vitest run --config vitest.rules.config.ts",
 		"prepare": "husky",
 		"doctor": "react-doctor"
 	},
