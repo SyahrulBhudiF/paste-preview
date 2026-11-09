@@ -305,8 +305,7 @@
 		content: "";
 	}
 
-	.code-editor textarea,
-	.source-mirror {
+	.code-editor textarea {
 		height: 100%;
 		border: 0;
 		border-radius: 0;
@@ -337,37 +336,22 @@
 		width: calc(100% - 44px);
 	}
 
-	.source-mirror {
+	.source-gutter {
 		position: absolute;
-		inset: 0;
-		margin: 0;
-		overflow: auto;
-		padding: 8px 10px 8px 54px;
-		color: transparent;
-		pointer-events: none;
-		counter-reset: source-line;
-	}
-
-	.source-line {
-		position: relative;
-		display: block;
-		min-height: 22px;
-	}
-
-	.source-line::before {
-		position: absolute;
-		left: -54px;
+		inset: 0 auto 0 0;
 		width: 44px;
-		padding-right: 10px;
+		margin: 0;
+		overflow: hidden;
+		padding: 8px 10px 8px 0;
 		color: var(--muted-foreground);
+		font-family: var(--font-mono);
 		font-size: 11px;
+		line-height: 22px;
 		text-align: right;
-		counter-increment: source-line;
-		content: counter(source-line);
+		pointer-events: none;
 	}
 
-	.code-editor[data-wrap="true"] textarea,
-	.code-editor[data-wrap="true"] .source-line {
+	.code-editor[data-wrap="true"] textarea {
 		overflow-wrap: anywhere;
 		white-space: pre-wrap;
 	}

@@ -5,12 +5,14 @@ import { CodeOptions } from "@/features/paste-preview/components/code-options";
 import { FieldErrors } from "@/features/paste-preview/components/form/field-errors";
 import { PastePreview } from "@/features/paste-preview/components/preview";
 import type { PasteFormApi } from "@/features/paste-preview/hooks/use-paste-form";
+import { LivePreviewCharacterLimit } from "@/features/paste-preview/preview-limit";
 import { cn } from "@/libs/utils/cn";
 import type { PasteFormValues } from "@/libs/schemas/paste";
 
 interface PasteEditorPanesProps {
 	form: PasteFormApi;
 	content: string;
+	previewContent: string;
 	previewLanguage: PasteFormValues["language"];
 	hasContent: boolean;
 	onContentChange: (content: string) => void;
@@ -19,6 +21,7 @@ interface PasteEditorPanesProps {
 export function PasteEditorPanes({
 	form,
 	content,
+	previewContent,
 	previewLanguage,
 	hasContent,
 	onContentChange,
@@ -26,6 +29,12 @@ export function PasteEditorPanes({
 	const [activePane, setActivePane] = useState<"editor" | "preview">("editor");
 	const [showLineNumbers, setShowLineNumbers] = useState(true);
 	const [wrap, setWrap] = useState(false);
+
+	const toggleWrap = () => {
+		const next = !wrap;
+		setWrap(next);
+		if (next) setShowLineNumbers(false);
+	};
 
 	const copySource = async () => {
 		try {
@@ -75,7 +84,8 @@ export function PasteEditorPanes({
 							showLineNumbers={showLineNumbers}
 							onLineNumbersChange={setShowLineNumbers}
 							wrap={wrap}
-							onWrapChange={setWrap}
+							onWrapChange={toggleWrap}
+							lineNumbersDisabled={wrap}
 						/>
 					</div>
 					<form.Field name="content">
@@ -112,10 +122,11 @@ export function PasteEditorPanes({
 					</div>
 					<div className="min-h-0 min-w-0 flex-1 overflow-hidden">
 						<PastePreview
-							content={content}
+							content={previewContent}
 							language={previewLanguage}
 							showLineNumbers={showLineNumbers}
 							wrap={wrap}
+							characterLimit={LivePreviewCharacterLimit}
 						/>
 					</div>
 				</section>

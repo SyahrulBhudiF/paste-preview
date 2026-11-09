@@ -155,7 +155,10 @@ export const detectPasteLanguage = (content: string): PasteLanguage => {
 	)
 		return "c++";
 	if (/^\s*#\s*include\s*[<"][^>"]+\.h[>"]|\bint\s+main\s*\(/m.test(trimmed)) return "c";
-	if (/^---[\s\S]*---\s*\n[\s\S]*<\w+|<\w+[\s\S]*\bclient:(load|idle|visible)\b/.test(trimmed))
+	if (
+		/^---[\s\S]*?---\s*\n[\s\S]*?<[A-Za-z]/.test(trimmed) ||
+		/<[A-Za-z][\w.-]*\b[^>]*\bclient:(?:load|idle|visible)\b/.test(trimmed)
+	)
 		return "astro";
 	if (/\{#(if|each|await)\b|\bon:click=|\bclass:/.test(trimmed)) return "svelte";
 	if (/<template[\s\S]*>[\s\S]*<\/template>|defineProps\s*\(|defineEmits\s*\(/i.test(trimmed))

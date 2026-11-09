@@ -1,5 +1,8 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { MaxPasteContentLength } from "@/libs/schemas/paste";
+
+const buildLineNumbers = (lineCount: number) =>
+	Array.from({ length: lineCount }, (_, index) => index + 1).join("\n");
 
 export function CodeEditor({
 	content,
@@ -13,24 +16,15 @@ export function CodeEditor({
 	wrap: boolean;
 }) {
 	const editorRef = useRef<HTMLTextAreaElement>(null);
-	const mirrorRef = useRef<HTMLPreElement>(null);
+	const gutterRef = useRef<HTMLPreElement>(null);
+	const lineCount = content.split("\n").length;
+	const lineNumbers = useMemo(() => buildLineNumbers(lineCount), [lineCount]);
 
 	return (
 		<div className="code-editor" data-line-numbers={showLineNumbers} data-wrap={wrap}>
 			{showLineNumbers ? (
-				<pre
-					ref={(element) => {
-						mirrorRef.current = element;
-						if (element) element.scrollTop = editorRef.current?.scrollTop ?? 0;
-					}}
-					className="source-mirror"
-					aria-hidden="true"
-				>
-					{content.split("\n").map((line, index) => (
-						<span className="source-line" key={index + 1}>
-							{line || "\u200b"}
-						</span>
-					))}
+				<pre ref={gutterRef} className="source-gutter" aria-hidden="true">
+					{lineNumbers}
 				</pre>
 			) : null}
 			<textarea
@@ -41,8 +35,8 @@ export function CodeEditor({
 				maxLength={MaxPasteContentLength}
 				onChange={(event) => onChange(event.target.value)}
 				onScroll={(event) => {
-					if (mirrorRef.current)
-						mirrorRef.current.scrollTop = event.currentTarget.scrollTop;
+					if (gutterRef.current)
+						gutterRef.current.scrollTop = event.currentTarget.scrollTop;
 				}}
 				placeholder="Paste code, Markdown, HTML, or notes..."
 				spellCheck={false}

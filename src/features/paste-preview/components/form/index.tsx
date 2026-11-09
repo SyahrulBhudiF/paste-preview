@@ -15,6 +15,7 @@ export function PasteForm() {
 		isSaving,
 		languageLabel,
 		password,
+		previewContent,
 		previewLanguage,
 		selectedLanguage,
 		setPassword,
@@ -46,6 +47,7 @@ export function PasteForm() {
 			<PasteEditorPanes
 				form={form}
 				content={content}
+				previewContent={previewContent}
 				previewLanguage={previewLanguage}
 				hasContent={hasContent}
 				onContentChange={setContent}

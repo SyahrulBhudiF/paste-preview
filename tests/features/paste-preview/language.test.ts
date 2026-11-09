@@ -207,6 +207,18 @@ describe("language utilities", () => {
 		expect(detectPasteLanguage("nothing special here")).toBe("text");
 	});
 
+	it("detects astro client directives", () => {
+		expect(detectPasteLanguage("<Component client:load />")).toBe("astro");
+	});
+
+	it("detects large html without catastrophic backtracking", () => {
+		const block =
+			"<section><h2>Heading</h2><p>Some <strong>bold</strong> text.</p></section>\n";
+		const content = block.repeat(Math.ceil(200_000 / block.length)).slice(0, 200_000);
+
+		expect(detectPasteLanguage(content)).toBe("html");
+	});
+
 	for (const [alias, language] of aliasCases) {
 		it(`normalizes ${alias} to ${language}`, () => {
 			expect(normalizeLanguage(alias)).toBe(language);

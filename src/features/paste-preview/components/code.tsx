@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { normalizeLanguage } from "@/libs/language";
 import { highlighter, isHighlightSupported, toHighlightLanguage } from "@/libs/highlight";
 
@@ -136,17 +136,21 @@ export function CodePreview({
 }: CodePreviewProps) {
 	const normalized = normalizeLanguage(language);
 	const shikiLanguage = ShikiLanguageMap[normalized] ?? "text";
+	const supported = isHighlightSupported(normalized);
+	const html = useMemo(() => {
+		if (!supported) return null;
 
-	if (isHighlightSupported(normalized)) {
-		const html = highlighter.highlightToHtml(content, {
+		const highlighted = highlighter.highlightToHtml(content, {
 			lang: toHighlightLanguage(normalized),
 			lineNumbers: true,
 		});
-		const numberedHtml = content.endsWith("\n")
-			? html.replace("</code>", '<span class="th-line"></span></code>')
-			: html;
+		return content.endsWith("\n")
+			? highlighted.replace("</code>", '<span class="th-line"></span></code>')
+			: highlighted;
+	}, [content, normalized, supported]);
 
-		return <CodeFrame html={numberedHtml} showLineNumbers={showLineNumbers} wrap={wrap} />;
+	if (html !== null) {
+		return <CodeFrame html={html} showLineNumbers={showLineNumbers} wrap={wrap} />;
 	}
 
 	return (

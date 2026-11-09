@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { createPaste } from "@/apis/paste";
+import { useDebouncedValue } from "@/features/paste-preview/hooks/use-debounced-value";
 import { clearDraft, usePasteDraft } from "@/features/paste-preview/hooks/use-paste-draft";
 import { getPasteLanguageView } from "@/features/paste-preview/paste-language-view";
 import { getShareLink, type SavedPaste } from "@/features/paste-preview/share-link";
@@ -80,9 +81,10 @@ export function usePasteForm() {
 	const title = useSelector(form.store, (state) => state.values.title);
 	const expiresIn = useSelector(form.store, (state) => state.values.expiresIn);
 	const password = useSelector(form.store, (state) => state.values.password);
+	const previewContent = useDebouncedValue(content, 150);
 	const languageView = useMemo(
-		() => getPasteLanguageView(content, language),
-		[content, language],
+		() => getPasteLanguageView(previewContent, language),
+		[previewContent, language],
 	);
 	const hasContent = content.trim().length > 0;
 	const savedPaste = createPasteMutation.data?.saved ?? null;
@@ -124,6 +126,7 @@ export function usePasteForm() {
 		isSaving: createPasteMutation.isPending,
 		languageLabel: languageView.languageLabel,
 		password,
+		previewContent,
 		previewLanguage: languageView.previewLanguage,
 		selectedLanguage: language,
 		setPassword: (value: string) => form.setFieldValue("password", value),
