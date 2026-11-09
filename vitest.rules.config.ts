@@ -7,6 +7,7 @@ export default defineConfig({
 	test: {
 		environment: "node",
 		include: ["tools/oxlint/anti-slop/rules/**/*.test.ts"],
+		globals: true,
 		fileParallelism: false,
 		isolate: false,
 		maxWorkers: 1,
