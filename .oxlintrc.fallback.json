@@ -1,0 +1,21 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "react", "jsx-a11y", "vitest"],
+	"env": {
+		"browser": true,
+		"es2022": true,
+		"node": true
+	},
+	"ignorePatterns": [
+		"node_modules/**",
+		"dist/**",
+		".alchemy/**",
+		".agents/**",
+		".wrangler/**",
+		"tools/oxlint/anti-slop/**",
+		"src/routeTree.gen.ts"
+	],
+	"rules": {
+		"no-console": "warn"
+	}
+}
