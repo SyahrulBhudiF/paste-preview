@@ -1,21 +1,23 @@
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { cn } from "@/libs/utils/cn";
+import { css } from "@styled/css";
+import type { SystemStyleObject } from "@styled/types";
+import { dialogRecipe } from "./dialog.styles";
+
+const slotStyles = dialogRecipe.raw();
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
-export function DialogContent({ className, children, ...props }: DialogPrimitive.Popup.Props) {
+export function DialogContent({
+	css: styles,
+	children,
+	...props
+}: Omit<DialogPrimitive.Popup.Props, "className"> & { css?: SystemStyleObject }) {
 	return (
 		<DialogPrimitive.Portal>
-			<DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-slate-950/35" />
-			<DialogPrimitive.Popup
-				className={cn(
-					"fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 border border-border bg-card p-4 text-card-foreground shadow-lg outline-none",
-					className,
-				)}
-				{...props}
-			>
+			<DialogPrimitive.Backdrop className={css(slotStyles.backdrop)} />
+			<DialogPrimitive.Popup className={css(slotStyles.popup, styles)} {...props}>
 				{children}
 			</DialogPrimitive.Popup>
 		</DialogPrimitive.Portal>

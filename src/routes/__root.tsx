@@ -1,6 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import { token } from "@styled/tokens";
 import { ErrorPage } from "@/routes/-error-page";
 import { NotFoundPage } from "@/routes/-not-found-page";
 import "github-markdown-css/github-markdown-light.css";
@@ -54,7 +55,7 @@ function RootDocument() {
 				<Toaster
 					position="bottom-right"
 					offset={{ bottom: 40 }}
-					toastOptions={{ style: { borderRadius: "var(--radius)", boxShadow: "none" } }}
+					toastOptions={{ style: { borderRadius: token("radii.lg"), boxShadow: "none" } }}
 				/>
 				<Scripts />
 			</body>

@@ -20,7 +20,7 @@ single-app feature layout rather than introducing a second UI architecture.
 
 ## Interaction rules
 
-- Use theme tokens and the existing Tailwind v4 conventions.
+- Use Panda tokens and the `css()`/`cva`/`sva` conventions. Keep style declarations out of `.tsx` (sibling `.styles.ts` for primitives, the feature `styles/` folder for feature styles).
 - Use semantic controls and labels; preserve keyboard and screen-reader access.
 - Keep actionable validation or request errors next to the relevant control.
 - Use Sonner for meaningful business-process success and failure feedback, not

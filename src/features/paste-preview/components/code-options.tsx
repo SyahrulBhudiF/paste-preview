@@ -1,3 +1,9 @@
+import { css } from "@styled/css";
+import { optionsGroupStyles } from "@/features/paste-preview/styles/code-options";
+import { workspaceChrome } from "@/features/paste-preview/styles/workspace";
+
+const styles = workspaceChrome({ actionBlocked: true });
+
 export function CodeOptions({
 	showLineNumbers,
 	onLineNumbersChange,
@@ -12,9 +18,9 @@ export function CodeOptions({
 	lineNumbersDisabled?: boolean;
 }) {
 	return (
-		<div className="flex items-center divide-x divide-border">
+		<div className={css(optionsGroupStyles)}>
 			<button
-				className="code-action disabled:cursor-not-allowed disabled:opacity-50"
+				className={styles.action}
 				type="button"
 				aria-pressed={showLineNumbers}
 				disabled={lineNumbersDisabled}
@@ -28,7 +34,7 @@ export function CodeOptions({
 				Line numbers: {showLineNumbers ? "on" : "off"}
 			</button>
 			<button
-				className="code-action"
+				className={styles.action}
 				type="button"
 				aria-pressed={wrap}
 				onClick={() => onWrapChange(!wrap)}

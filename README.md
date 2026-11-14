@@ -19,7 +19,7 @@ Share code, Markdown, and HTML through public links. Each paste can have a title
 
 - TanStack Start and React 19
 - Effect-TS
-- Tailwind CSS v4
+- Panda CSS
 - Cloudflare Workers and KV
 
 ## Development

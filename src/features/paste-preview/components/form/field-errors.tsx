@@ -1,3 +1,6 @@
+import { css } from "@styled/css";
+import { fieldErrorStyles } from "@/features/paste-preview/styles/field-errors";
+
 interface FieldErrorsProps {
 	errors: ReadonlyArray<{ message: string } | undefined>;
 }
@@ -8,7 +11,7 @@ export function FieldErrors({ errors }: FieldErrorsProps) {
 	if (!message) return null;
 
 	return (
-		<p role="alert" className="mt-1 text-xs text-destructive">
+		<p role="alert" className={css(fieldErrorStyles)}>
 			{message}
 		</p>
 	);

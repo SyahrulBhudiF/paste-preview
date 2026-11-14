@@ -23,3 +23,6 @@
 /arch
 .claude
 .agents/skills/react-doctor/
+
+# Panda
+styled-system

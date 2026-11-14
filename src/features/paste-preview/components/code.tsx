@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { css } from "@styled/css";
 import { normalizeLanguage } from "@/libs/language";
 import { highlighter, isHighlightSupported, toHighlightLanguage } from "@/libs/highlight";
+import { codeViewerStyles } from "@/features/paste-preview/styles/code";
 
 const ShikiLanguageMap = {
 	auto: "text",
@@ -79,7 +81,7 @@ function CodeFrame({
 }) {
 	return (
 		<div
-			className="code-viewer"
+			className={css(codeViewerStyles)}
 			data-line-numbers={showLineNumbers}
 			data-wrap={wrap}
 			dangerouslySetInnerHTML={{ __html: html }}

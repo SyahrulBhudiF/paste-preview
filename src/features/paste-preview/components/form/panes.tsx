@@ -4,10 +4,13 @@ import { CodeEditor } from "@/features/paste-preview/components/code-editor";
 import { CodeOptions } from "@/features/paste-preview/components/code-options";
 import { FieldErrors } from "@/features/paste-preview/components/form/field-errors";
 import { PastePreview } from "@/features/paste-preview/components/preview";
+import { panes } from "@/features/paste-preview/styles/panes";
+import { workspaceChrome } from "@/features/paste-preview/styles/workspace";
 import type { PasteFormApi } from "@/features/paste-preview/hooks/use-paste-form";
 import { LivePreviewCharacterLimit } from "@/features/paste-preview/preview-limit";
-import { cn } from "@/libs/utils/cn";
 import type { PasteFormValues } from "@/libs/schemas/paste";
+
+const chrome = workspaceChrome();
 
 interface PasteEditorPanesProps {
 	form: PasteFormApi;
@@ -29,6 +32,7 @@ export function PasteEditorPanes({
 	const [activePane, setActivePane] = useState<"editor" | "preview">("editor");
 	const [showLineNumbers, setShowLineNumbers] = useState(true);
 	const [wrap, setWrap] = useState(false);
+	const styles = panes({ pane: activePane });
 
 	const toggleWrap = () => {
 		const next = !wrap;
@@ -47,12 +51,9 @@ export function PasteEditorPanes({
 
 	return (
 		<>
-			<fieldset
-				className="flex min-w-0 shrink-0 border border-b-0 border-border bg-secondary/50 md:hidden"
-				aria-label="Visible pane"
-			>
+			<fieldset className={styles.switch} aria-label="Visible pane">
 				<button
-					className="pane-tab"
+					className={chrome.tab}
 					type="button"
 					aria-pressed={activePane === "editor"}
 					onClick={() => setActivePane("editor")}
@@ -60,7 +61,7 @@ export function PasteEditorPanes({
 					Source
 				</button>
 				<button
-					className="pane-tab"
+					className={chrome.tab}
 					type="button"
 					aria-pressed={activePane === "preview"}
 					onClick={() => setActivePane("preview")}
@@ -68,16 +69,10 @@ export function PasteEditorPanes({
 					Preview
 				</button>
 			</fieldset>
-			<div className="grid min-h-0 min-w-0 flex-1 border border-border bg-card md:grid-cols-2">
-				<section
-					aria-label="Source editor"
-					className={cn(
-						"min-h-0 min-w-0 flex-col md:flex",
-						activePane === "editor" ? "flex" : "hidden",
-					)}
-				>
-					<div className="pane-toolbar">
-						<label className="pane-label" htmlFor="paste-content">
+			<div className={styles.grid}>
+				<section className={styles.editorPane} aria-label="Source editor">
+					<div className={chrome.toolbar}>
+						<label className={chrome.label} htmlFor="paste-content">
 							Source
 						</label>
 						<CodeOptions
@@ -90,7 +85,7 @@ export function PasteEditorPanes({
 					</div>
 					<form.Field name="content">
 						{(field) => (
-							<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+							<div className={styles.editorBody}>
 								<CodeEditor
 									content={field.state.value}
 									onChange={onContentChange}
@@ -102,17 +97,11 @@ export function PasteEditorPanes({
 						)}
 					</form.Field>
 				</section>
-				<section
-					aria-label="Live preview"
-					className={cn(
-						"min-h-0 min-w-0 flex-col md:flex md:border-l md:border-border",
-						activePane === "preview" ? "flex" : "hidden",
-					)}
-				>
-					<div className="pane-toolbar">
-						<h2 className="pane-label">Preview</h2>
+				<section className={styles.previewPane} aria-label="Live preview">
+					<div className={chrome.toolbar}>
+						<h2 className={chrome.label}>Preview</h2>
 						<button
-							className="code-action"
+							className={chrome.action}
 							type="button"
 							onClick={copySource}
 							disabled={!hasContent}
@@ -120,7 +109,7 @@ export function PasteEditorPanes({
 							Copy
 						</button>
 					</div>
-					<div className="min-h-0 min-w-0 flex-1 overflow-hidden">
+					<div className={styles.previewBody}>
 						<PastePreview
 							content={previewContent}
 							language={previewLanguage}

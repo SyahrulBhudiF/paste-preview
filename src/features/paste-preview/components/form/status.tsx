@@ -1,4 +1,7 @@
+import { workspaceChrome } from "@/features/paste-preview/styles/workspace";
 import { PasteExpiryOptions, type PasteExpiry } from "@/libs/schemas/paste";
+
+const styles = workspaceChrome();
 
 interface PasteStatusFooterProps {
 	content: string;
@@ -12,13 +15,13 @@ export function PasteStatusFooter({ content, languageLabel, expiresIn }: PasteSt
 		PasteExpiryOptions.find((option) => option.value === expiresIn)?.label ?? "7 days";
 
 	return (
-		<footer className="workspace-status">
+		<footer className={styles.status}>
 			<span>
 				{lineCount.toLocaleString()} lines · {content.length.toLocaleString()} characters ·
 				UTF-8
 			</span>
-			<span className="hidden sm:inline">{languageLabel}</span>
-			<span className="sm:hidden">Expires in {expiryLabel}</span>
+			<span className={styles.language}>{languageLabel}</span>
+			<span className={styles.expiry}>Expires in {expiryLabel}</span>
 		</footer>
 	);
 }

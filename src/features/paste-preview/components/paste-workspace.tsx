@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 import { CodeOptions } from "@/features/paste-preview/components/code-options";
 import { CodePreview } from "@/features/paste-preview/components/code";
 import { PastePreview } from "@/features/paste-preview/components/preview";
+import { pasteWorkspace } from "@/features/paste-preview/styles/paste-workspace";
+import { workspaceChrome } from "@/features/paste-preview/styles/workspace";
 import type { PublicPaste } from "@/infrastructure/schemas/paste";
 import { downloadText, getDownloadName } from "@/libs/download";
 import { isHtmlLanguage, isMarkdownLanguage, normalizeLanguage } from "@/libs/language";
 import { formatExpiry } from "@/libs/utils/time";
+
+const styles = pasteWorkspace();
+const chrome = workspaceChrome({ toolbarWrap: true });
+const floatingChrome = workspaceChrome({ statusFloating: true });
 
 export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 	const [mode, setMode] = useState<"preview" | "source">("preview");
@@ -32,12 +38,9 @@ export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 
 	return (
 		<>
-			<section
-				className="flex min-h-0 min-w-0 flex-1 flex-col border border-border bg-card"
-				aria-label="Shared paste"
-			>
-				<div className="pane-toolbar flex-wrap">
-					<span className="pane-label">{showSource ? "Source" : "Preview"}</span>
+			<section className={styles.root} aria-label="Shared paste">
+				<div className={chrome.toolbar}>
+					<span className={chrome.label}>{showSource ? "Source" : "Preview"}</span>
 					{showSource ? (
 						<CodeOptions
 							showLineNumbers={showLineNumbers}
@@ -48,7 +51,7 @@ export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 					) : null}
 					{hasRenderedPreview ? (
 						<button
-							className="code-action"
+							className={chrome.action}
 							type="button"
 							onClick={() =>
 								setMode((current) => (current === "preview" ? "source" : "preview"))
@@ -57,14 +60,14 @@ export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 							{showSource ? "View preview" : "View source"}
 						</button>
 					) : null}
-					<button className="code-action" type="button" onClick={copySource}>
+					<button className={chrome.action} type="button" onClick={copySource}>
 						Copy source
 					</button>
-					<button className="code-action" type="button" onClick={downloadSource}>
+					<button className={chrome.action} type="button" onClick={downloadSource}>
 						Download
 					</button>
 				</div>
-				<div className="min-h-0 min-w-0 flex-1 overflow-hidden">
+				<div className={styles.body}>
 					{showSource ? (
 						<CodePreview
 							content={paste.content}
@@ -77,7 +80,7 @@ export function PasteWorkspace({ paste }: { paste: PublicPaste }) {
 					)}
 				</div>
 			</section>
-			<footer className="workspace-status">
+			<footer className={chrome.status}>
 				<span>
 					{paste.content.split("\n").length.toLocaleString()} lines ·{" "}
 					{paste.content.length.toLocaleString()} characters
@@ -98,16 +101,16 @@ export function LockedPastePanel({
 	onUnlock: () => void;
 }) {
 	return (
-		<section className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 border border-border bg-card px-4 text-center">
-			<h2 className="text-sm font-semibold">This paste is password-protected</h2>
-			<p className="max-w-sm text-sm text-muted-foreground">
+		<section className={styles.lockedRoot}>
+			<h2 className={styles.lockedTitle}>This paste is password-protected</h2>
+			<p className={styles.lockedDescription}>
 				Enter the password shared by the paste’s creator to view its contents.
 			</p>
 			<Button type="button" onClick={onUnlock}>
 				Enter password
 			</Button>
 			{!dialogOpen ? (
-				<footer className="workspace-status absolute bottom-2 left-3 right-3">
+				<footer className={floatingChrome.status}>
 					<span>{formatExpiry(expiresAt)}</span>
 				</footer>
 			) : null}

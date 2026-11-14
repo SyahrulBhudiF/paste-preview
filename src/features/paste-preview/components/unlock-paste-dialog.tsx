@@ -2,9 +2,12 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { dialogRecipe } from "@/components/ui/dialog.styles";
 import { unlockPaste } from "@/apis/paste";
 import type { PublicPaste } from "@/infrastructure/schemas/paste";
 import { formatExpiry } from "@/libs/utils/time";
+
+const styles = dialogRecipe();
 
 interface UnlockPasteDialogProps {
 	open: boolean;
@@ -65,24 +68,19 @@ export function UnlockPasteDialog({
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent>
-				<div className="mb-4 space-y-1">
-					<DialogTitle className="text-base font-semibold">
-						Password-protected paste
-					</DialogTitle>
-					<DialogDescription className="text-sm text-muted-foreground">
+				<div className={styles.header}>
+					<DialogTitle className={styles.title}>Password-protected paste</DialogTitle>
+					<DialogDescription className={styles.description}>
 						Enter the password to unlock and view this paste.
 					</DialogDescription>
-					<p className="text-xs text-muted-foreground">{formatExpiry(expiresAt)}</p>
+					<p className={styles.hint}>{formatExpiry(expiresAt)}</p>
 				</div>
-				<form className="space-y-3" onSubmit={(event) => void unlock(event)}>
-					<label
-						className="block space-y-1 text-xs font-medium"
-						htmlFor="unlock-password"
-					>
+				<form className={styles.form} onSubmit={(event) => void unlock(event)}>
+					<label className={styles.label} htmlFor="unlock-password">
 						<span>Password</span>
 						<input
+							className={styles.input}
 							autoComplete="current-password"
-							className="h-9 w-full border border-input bg-background px-2 text-sm outline-none focus:border-ring focus:ring-1 focus:ring-ring"
 							id="unlock-password"
 							maxLength={128}
 							onChange={(event) => setPassword(event.target.value)}
@@ -92,11 +90,11 @@ export function UnlockPasteDialog({
 						/>
 					</label>
 					{error ? (
-						<p className="text-sm text-destructive" role="alert">
+						<p className={styles.error} role="alert">
 							{error}
 						</p>
 					) : null}
-					<div className="flex justify-end gap-2 pt-2">
+					<div className={styles.actions}>
 						<Button
 							type="button"
 							variant="ghost"

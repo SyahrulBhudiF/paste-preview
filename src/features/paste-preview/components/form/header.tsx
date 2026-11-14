@@ -9,8 +9,12 @@ import {
 } from "@/components/ui/combobox";
 import { FieldErrors } from "@/features/paste-preview/components/form/field-errors";
 import type { PasteFormApi } from "@/features/paste-preview/hooks/use-paste-form";
+import { languageInputStyles, saveButtonStyles } from "@/features/paste-preview/styles/form";
+import { workspaceChrome } from "@/features/paste-preview/styles/workspace";
 import { PasteLanguages } from "@/libs/language";
 import type { PasteFormValues } from "@/libs/schemas/paste";
+
+const styles = workspaceChrome();
 
 interface PasteFormHeaderProps {
 	form: PasteFormApi;
@@ -28,13 +32,13 @@ export function PasteFormHeader({
 	hasContent,
 }: PasteFormHeaderProps) {
 	return (
-		<header className="app-header">
-			<h1 className="app-wordmark">
+		<header className={styles.header}>
+			<h1 className={styles.wordmark}>
 				paste<span>/</span>preview
 			</h1>
 			<form.Field name="language">
 				{(field) => (
-					<div className="flex min-w-0 flex-col">
+					<div className={styles.fieldColumn}>
 						<Combobox
 							items={PasteLanguages}
 							value={
@@ -55,7 +59,7 @@ export function PasteFormHeader({
 							<ComboboxInput
 								aria-label="Language"
 								placeholder={languageLabel}
-								className="w-26 min-[380px]:w-32 sm:w-44"
+								css={languageInputStyles}
 							/>
 							<ComboboxContent>
 								<ComboboxEmpty>No languages found.</ComboboxEmpty>
@@ -76,7 +80,7 @@ export function PasteFormHeader({
 				type="submit"
 				size="sm"
 				disabled={isSaving || !hasContent}
-				className="ml-auto shrink-0 sm:ml-0"
+				css={saveButtonStyles}
 			>
 				{isSaving ? "Saving..." : "Save & share"}
 			</Button>

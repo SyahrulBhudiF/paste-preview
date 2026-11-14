@@ -3,7 +3,10 @@ import { CodePreview } from "./code";
 import { HtmlPreview } from "./html";
 import { MarkdownPreview } from "./markdown";
 import { limitPreviewContent } from "@/features/paste-preview/preview-limit";
+import { preview } from "@/features/paste-preview/styles/preview";
 import { isHtmlLanguage, isMarkdownLanguage, normalizeLanguage } from "@/libs/language";
+
+const styles = preview();
 
 interface PastePreviewProps {
 	content: string;
@@ -29,10 +32,10 @@ export const PastePreview = memo(function PastePreview({
 	const previewContent = truncated && !showFull ? limitPreviewContent(content, limit) : content;
 
 	if (!previewContent.trim()) {
-		return <p className="px-3 py-2 text-xs text-muted-foreground">Nothing to preview yet.</p>;
+		return <p className={styles.empty}>Nothing to preview yet.</p>;
 	}
 
-	const preview = isMarkdownLanguage(normalized) ? (
+	const previewNode = isMarkdownLanguage(normalized) ? (
 		<MarkdownPreview content={previewContent} />
 	) : isHtmlLanguage(normalized) ? (
 		<HtmlPreview content={previewContent} />
@@ -45,24 +48,24 @@ export const PastePreview = memo(function PastePreview({
 		/>
 	);
 
-	if (!truncated || showFull) return preview;
+	if (!truncated || showFull) return previewNode;
 
 	return (
-		<div className="flex h-full min-h-0 flex-col">
-			<div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-secondary/40 px-3 py-1.5 text-xs text-muted-foreground">
+		<div className={styles.limited}>
+			<div className={styles.banner}>
 				<span>
 					Preview limited to the first {limit.toLocaleString()} characters of{" "}
 					{content.length.toLocaleString()}.
 				</span>
 				<button
-					className="shrink-0 underline underline-offset-2 hover:text-foreground"
+					className={styles.showFull}
 					type="button"
 					onClick={() => startTransition(() => setExpandedContent(content))}
 				>
 					{isPending ? "Rendering full preview..." : "Show full preview"}
 				</button>
 			</div>
-			<div className="min-h-0 flex-1">{preview}</div>
+			<div className={styles.body}>{previewNode}</div>
 		</div>
 	);
 });

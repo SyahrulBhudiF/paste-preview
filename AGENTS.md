@@ -1,6 +1,6 @@
 # Paste Preview — Agent Rules
 
-Cloudflare Worker app: TanStack Start + Effect-TS + Tailwind v4. Paste snippets
+Cloudflare Worker app: TanStack Start + Effect-TS + Panda CSS. Paste snippets
 are stored in KV and shared through public URLs.
 
 Read [.agents/CONTEXT.md](.agents/CONTEXT.md) for architecture and domain
@@ -18,6 +18,7 @@ features, web features, or verifying changes.
 - `vp run doctor --verbose` — React Doctor full scan
 - `vp run doctor --verbose --scope changed` — React Doctor changed-files scan
 - `vp run lint:fix` — auto-fix lint issues
+- `vp run codegen` — regenerate `styled-system/` after changing `panda.config.ts`
 - Single test: `vp run test:run -- path/to/file.test.ts`
 - Pre-commit (husky): `vp run check && vp run test:run`
 
@@ -33,19 +34,21 @@ features, web features, or verifying changes.
 ## Folder Contract
 
 ```
+panda.config.ts           Panda theme: semantic colors, fonts, radii, text styles
 src/apis/                 Server functions
-src/components/ui/        Shared UI primitives (Base UI)
-src/features/             Feature modules
+src/components/ui/        Shared UI primitives (Base UI) and their `.styles.ts`
+src/features/             Feature modules; styles live in `styles/` or beside components
 src/infrastructure/       Effect services, errors, schemas, config
 src/libs/                 Client utils, schemas
 src/routes/               TanStack file routes (keep thin)
-src/styles/app.css        Tailwind theme tokens
+src/styles/app.css        Panda cascade layer entry only
+styled-system/            Generated Panda runtime (gitignored; `vp run codegen`)
 ```
 
 ## TypeScript
 
 - Strict mode. ES2022 target. Bundler module resolution.
-- Path alias: `@/*` → `./src/*`
+- Path aliases: `@/*` → `./src/*`, `@styled/*` → `./styled-system/*`
 - Use `import type` for type-only imports.
 
 ## Naming
@@ -99,12 +102,12 @@ export class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
 
 ## UI
 
-- Prefer theme tokens: `bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-card`
-- Use `cn()` from `@/libs/utils/cn` for conditional classes
-- Shared UI primitives in `src/components/ui/` use Base UI
-- Feature components in `src/features/*/components/`
-- Route components stay thin — delegate to features
-- Use Sonner for user-facing business-process success and failure feedback; keep actionable form errors inline
+- Styling uses Panda CSS. Tokens come from `panda.config.ts`; never hard-code the palette.
+- Use `css()` for one-off styles, `cva` for single-element variants, and `sva` for multi-part components.
+- Keep style declarations in dedicated style modules: sibling `.styles.ts` files for UI primitives and `src/features/*/styles/` for feature styles. `.tsx` files only reference generated classes or style objects.
+- Shared UI primitives in `src/components/ui/` use Base UI; feature components live in `src/features/*/components/`.
+- Route components stay thin — delegate to features.
+- Use Sonner for user-facing business-process success and failure feedback; keep actionable form errors inline.
 
 ## Validation
 

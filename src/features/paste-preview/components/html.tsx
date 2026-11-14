@@ -1,5 +1,8 @@
 import DOMPurify from "dompurify";
 import { useMemo, useSyncExternalStore } from "react";
+import { htmlPreview } from "@/features/paste-preview/styles/html";
+
+const styles = htmlPreview();
 
 const subscribe = () => () => {};
 const getClientSnapshot = () => true;
@@ -22,16 +25,12 @@ export function HtmlPreview({ content }: { content: string }) {
 	);
 
 	if (sanitized === null) {
-		return (
-			<div className="flex h-full w-full items-center justify-center bg-white text-xs text-muted-foreground">
-				HTML preview loads in the browser.
-			</div>
-		);
+		return <div className={styles.placeholder}>HTML preview loads in the browser.</div>;
 	}
 
 	return (
 		<iframe
-			className="block h-full w-full border-0 bg-white"
+			className={styles.frame}
 			title="HTML preview sandbox"
 			sandbox=""
 			srcDoc={sanitized}

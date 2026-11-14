@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { dialogRecipe } from "@/components/ui/dialog.styles";
+
+const styles = dialogRecipe();
 
 interface PasswordDialogProps {
 	open: boolean;
@@ -51,21 +54,19 @@ export function PasswordDialog({
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent>
-				<div className="mb-4 space-y-1">
-					<DialogTitle className="text-base font-semibold">
-						Password-protect paste
-					</DialogTitle>
-					<DialogDescription className="text-sm text-muted-foreground">
+				<div className={styles.header}>
+					<DialogTitle className={styles.title}>Password-protect paste</DialogTitle>
+					<DialogDescription className={styles.description}>
 						Readers need this password to open the paste. Share it separately from the
 						link. The password is an access gate, not encryption.
 					</DialogDescription>
 				</div>
-				<form className="space-y-3" onSubmit={savePassword}>
-					<label className="block space-y-1 text-xs font-medium" htmlFor="paste-password">
+				<form className={styles.form} onSubmit={savePassword}>
+					<label className={styles.label} htmlFor="paste-password">
 						<span>Password</span>
 						<input
+							className={styles.input}
 							autoComplete="new-password"
-							className="h-9 w-full border border-input bg-background px-2 text-sm outline-none focus:border-ring focus:ring-1 focus:ring-ring"
 							id="paste-password"
 							maxLength={128}
 							onChange={(event) => setPassword(event.target.value)}
@@ -74,14 +75,11 @@ export function PasswordDialog({
 							value={password}
 						/>
 					</label>
-					<label
-						className="block space-y-1 text-xs font-medium"
-						htmlFor="paste-password-confirmation"
-					>
+					<label className={styles.label} htmlFor="paste-password-confirmation">
 						<span>Confirm password</span>
 						<input
+							className={styles.input}
 							autoComplete="new-password"
-							className="h-9 w-full border border-input bg-background px-2 text-sm outline-none focus:border-ring focus:ring-1 focus:ring-ring"
 							id="paste-password-confirmation"
 							maxLength={128}
 							onChange={(event) => setConfirmation(event.target.value)}
@@ -91,11 +89,11 @@ export function PasswordDialog({
 						/>
 					</label>
 					{error ? (
-						<p className="text-sm text-destructive" role="alert">
+						<p className={styles.error} role="alert">
 							{error}
 						</p>
 					) : null}
-					<div className="flex justify-end gap-2 pt-2">
+					<div className={styles.actions}>
 						<Button
 							type="button"
 							variant="ghost"

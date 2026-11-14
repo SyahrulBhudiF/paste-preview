@@ -1,9 +1,11 @@
+import { css } from "@styled/css";
 import { PasteFormHeader } from "@/features/paste-preview/components/form/header";
 import { PasteOptionsBar } from "@/features/paste-preview/components/form/options";
 import { PasteEditorPanes } from "@/features/paste-preview/components/form/panes";
 import { ShareLinkBanner } from "@/features/paste-preview/components/form/share-link";
 import { PasteStatusFooter } from "@/features/paste-preview/components/form/status";
 import { usePasteForm } from "@/features/paste-preview/hooks/use-paste-form";
+import { formShellStyles } from "@/features/paste-preview/styles/form";
 
 export function PasteForm() {
 	const {
@@ -25,10 +27,7 @@ export function PasteForm() {
 	} = usePasteForm();
 
 	return (
-		<form
-			className="flex h-full min-h-0 min-w-0 flex-col px-2 pb-2 sm:px-3 sm:pb-3"
-			action={() => void form.handleSubmit()}
-		>
+		<form className={css(formShellStyles)} action={() => void form.handleSubmit()}>
 			<PasteFormHeader
 				form={form}
 				languageLabel={languageLabel}

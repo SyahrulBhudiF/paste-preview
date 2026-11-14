@@ -1,10 +1,21 @@
 import { LockKeyhole } from "lucide-react";
 import { useState } from "react";
+import { css } from "@styled/css";
 import { Button } from "@/components/ui/button";
 import { FieldErrors } from "@/features/paste-preview/components/form/field-errors";
 import { PasswordDialog } from "@/features/paste-preview/components/form/password-dialog";
+import {
+	expirySelectStyles,
+	lockIconStyles,
+	optionsBarStyles,
+	titleFieldStyles,
+	titleInputStyles,
+} from "@/features/paste-preview/styles/form";
+import { workspaceChrome } from "@/features/paste-preview/styles/workspace";
 import type { PasteFormApi } from "@/features/paste-preview/hooks/use-paste-form";
 import { PasteExpiryOptions } from "@/libs/schemas/paste";
+
+const styles = workspaceChrome();
 
 interface PasteOptionsBarProps {
 	form: PasteFormApi;
@@ -16,13 +27,13 @@ export function PasteOptionsBar({ form, password, onPasswordChange }: PasteOptio
 	const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 
 	return (
-		<div className="flex min-w-0 flex-wrap items-center gap-2 border-x border-border bg-card px-2 py-2 sm:px-3">
+		<div className={css(optionsBarStyles)}>
 			<form.Field name="title">
 				{(field) => (
-					<div className="flex min-w-0 flex-1 flex-col">
+					<div className={css(titleFieldStyles)}>
 						<input
 							aria-label="Paste title (optional)"
-							className="h-8 w-full min-w-28 border border-input bg-background px-2 text-xs outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+							className={css(titleInputStyles)}
 							maxLength={120}
 							placeholder="Title (optional)"
 							value={field.state.value}
@@ -34,10 +45,10 @@ export function PasteOptionsBar({ form, password, onPasswordChange }: PasteOptio
 			</form.Field>
 			<form.Field name="expiresIn">
 				{(field) => (
-					<div className="flex min-w-0 flex-col">
+					<div className={styles.fieldColumn}>
 						<select
 							aria-label="Paste expiry"
-							className="h-8 w-28 border border-input bg-background px-2 text-xs outline-none focus:border-ring focus:ring-1 focus:ring-ring"
+							className={css(expirySelectStyles)}
 							value={field.state.value}
 							onChange={(event) => {
 								const selected = PasteExpiryOptions.find(
@@ -58,14 +69,14 @@ export function PasteOptionsBar({ form, password, onPasswordChange }: PasteOptio
 			</form.Field>
 			<form.Field name="password">
 				{(field) => (
-					<div className="flex min-w-0 flex-col">
+					<div className={styles.fieldColumn}>
 						<Button
 							type="button"
 							size="sm"
 							variant={password ? "secondary" : "outline"}
 							onClick={() => setPasswordDialogOpen(true)}
 						>
-							<LockKeyhole className="size-3.5" aria-hidden="true" />
+							<LockKeyhole className={css(lockIconStyles)} aria-hidden="true" />
 							{password ? "Password on" : "Add password"}
 						</Button>
 						<PasswordDialog

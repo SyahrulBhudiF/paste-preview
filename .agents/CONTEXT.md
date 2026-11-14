@@ -27,3 +27,8 @@ URLs.
 7. **Use the shared UI boundary.** Primitives under `src/components/ui/` wrap
    Base UI. Feature UI belongs under `src/features/`. Use Sonner for business
    process feedback and inline messages for actionable form errors.
+8. **Styling is Panda CSS.** Tokens live in `panda.config.ts`. Use `css()` for
+   one-off styles, `cva` for single-element variants, and `sva` for multi-part
+   components. Keep style declarations in dedicated style modules (`.styles.ts`
+   beside primitives, `styles/` inside features) so `.tsx` files only compose
+   components and reference generated classes.

@@ -17,7 +17,8 @@
 		"jsx": "react-jsx",
 		"types": ["vite/client", "node"],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@styled/*": ["./styled-system/*"]
 		}
 	},
 	"include": [
@@ -26,6 +27,7 @@
 		"vite.config.ts",
 		"vitest.config.ts",
 		"vitest.rules.config.ts",
+		"panda.config.ts",
 		"alchemy/alchemy.run.ts",
 		"worker-configuration.d.ts"
 	],

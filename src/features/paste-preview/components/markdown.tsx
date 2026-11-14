@@ -1,7 +1,11 @@
 import { Markdown, type MarkdownComponents } from "@tanstack/markdown/react";
 import { Check, Copy } from "lucide-react";
 import { useRef, useState, type ComponentPropsWithoutRef } from "react";
+import { css, cx } from "@styled/css";
 import { highlightMarkdownCode } from "@/libs/highlight";
+import { markdown, markdownIconStyles } from "@/features/paste-preview/styles/markdown";
+
+const styles = markdown();
 
 function CopyableCodeBlock({ className, ...props }: ComponentPropsWithoutRef<"pre">) {
 	const preRef = useRef<HTMLPreElement>(null);
@@ -21,17 +25,21 @@ function CopyableCodeBlock({ className, ...props }: ComponentPropsWithoutRef<"pr
 	};
 
 	return (
-		<div className="group relative">
+		<div className={styles.copyWrap}>
 			<button
 				aria-label={copied ? "Code copied" : "Copy code"}
-				className="absolute right-2 top-2 z-10 inline-flex items-center gap-1.5 border border-border bg-card px-2 py-1 text-xs text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+				className={styles.copyButton}
 				onClick={() => void copyCode()}
 				type="button"
 			>
-				{copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+				{copied ? (
+					<Check className={css(markdownIconStyles)} />
+				) : (
+					<Copy className={css(markdownIconStyles)} />
+				)}
 				<span>{copied ? "Copied" : "Copy"}</span>
 			</button>
-			<pre ref={preRef} className={`${className ?? ""} pr-20`} {...props} />
+			<pre ref={preRef} className={cx(styles.codeBlock, className)} {...props} />
 		</div>
 	);
 }
@@ -59,7 +67,7 @@ const components = {
 
 export function MarkdownPreview({ content }: { content: string }) {
 	return (
-		<article className="markdown-renderer markdown-body h-full max-w-none overflow-auto p-3 sm:p-4">
+		<article className={cx("markdown-renderer markdown-body", styles.article)}>
 			<Markdown
 				highlighter={highlightMarkdownCode}
 				codeLineNumbers

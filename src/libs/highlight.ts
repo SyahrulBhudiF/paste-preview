@@ -97,4 +97,7 @@ export const highlightThemeCss = [
 		lineNumbersSelector: ".markdown-renderer .tm-code--line-numbers",
 	}),
 	".th-code { padding: 0 !important; }",
+	// The theme draws line numbers from an unlayered rule. Override it at the
+	// same level so the viewer's data attribute can hide them.
+	"[data-line-numbers=false] .th-code--line-numbers .th-line::before { display: none; }",
 ].join("\n");

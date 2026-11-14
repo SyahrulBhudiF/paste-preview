@@ -1,7 +1,12 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"plugins": ["typescript", "react", "jsx-a11y", "vitest"],
-	"jsPlugins": [{ "name": "anti-slop", "specifier": "./tools/oxlint/anti-slop/index.ts" }],
+	"jsPlugins": [
+		{
+			"name": "anti-slop",
+			"specifier": "./tools/oxlint/anti-slop/index.ts"
+		}
+	],
 	"env": {
 		"browser": true,
 		"es2022": true,
@@ -14,7 +19,8 @@
 		".agents/**",
 		".wrangler/**",
 		"tools/oxlint/anti-slop/**",
-		"src/routeTree.gen.ts"
+		"src/routeTree.gen.ts",
+		"styled-system/**"
 	],
 	"rules": {
 		"no-console": "warn",
